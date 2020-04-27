@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[在PYPI上发布软件]]></title>
+    <url>%2F%E5%9C%A8PYPI%E4%B8%8A%E5%8F%91%E5%B8%83%E8%BD%AF%E4%BB%B6.html</url>
+    <content type="text"><![CDATA[配置文件等的写法可参照这个项目 https://github.com/hosea1008/res_manager 步骤： 注册PYPI账号之后，准备setup.py文件 注意里面的Development Status字段的数字不是随意来的 准备requirements.txt 准备README.rst文件，格式同样参考以上项目 打包过程打tar.gz包 1python setup.py sdist build 打wheel包 1python setup.py bdist_wheel --universal 上传 12pip install twinetwine upload dist/*]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[大疆特洛TELLO手柄盖世小鸡Gamesir-T1D蓝牙连接破解DIY]]></title>
+    <url>%2F%E5%A4%A7%E7%96%86%E7%89%B9%E6%B4%9BTELLO%E6%89%8B%E6%9F%84%E7%9B%96%E4%B8%96%E5%B0%8F%E9%B8%A1Gamesir-T1D%E8%93%9D%E7%89%99%E8%BF%9E%E6%8E%A5%E7%A0%B4%E8%A7%A3DIY.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 手头有个大疆TELLO并买了个盖世小鸡Gamesir-T1D遥控器，想着玩够了小飞机还可以用手柄来做DIY小车。。。万万没想到这个遥控器居然是定制的，只能遥控TELLO小飞机。。。电脑和手机都无法通过蓝牙直接连接。遂破解之。 先拆为敬 正面，做工还真是可以，本来手柄的手感就挺好的。可以看到单片机控制板和蓝牙板是单独的两个小板，可能不同遥控用的是同一套底板和不同的蓝牙以及单片机吧。 蓝牙板，芯片名称被磨掉了打上GS-T1d他们自家的标签。看起来像是CC2541方案。单片机和蓝牙之间预留有IIC的测试点。 单片机控制板，同样磨掉了芯片丝印。。 背后貌似预留了串口测试点？ 硬件上看不出怎么破，手头没有设备，算了，拆开看一眼装回去。 用BLE调试软件连接，发现并不是用的设想的蓝牙串口方案来遥控，而是真的蓝牙协议。一共有3个Services，其中第三个Service接收的字节流一直不变，第二个变化没有什么规律。第一个UUID开头是00008651的Servie接收的字节流，变化比较有规律。 通过调试发现，在遥控器无动作的时候，第一个Service接收值一直都是C9-C6-86-A1-00-DB-B9-03-01-01-01-0B-01-E1-07-07-06-10-1E-56 有动作的时候，前两个Bytes一直是A1-C5。因此，前两个字节可以用来判断遥控状态。 以下的讨论都是在A1-C5状态下。 最后一个字节是一直自增的，按键按下，放开会使得该字节自增2，一直到0xFF又变回0x00，这个是用来记录按键按下次数的。 10-13字节是按键按下的状态，手柄上每个按键对应一位。实际上只要把这几个字节读取出来，就能和按键一一对应上了。 接下来是摇杆。3-7字节就是摇杆状态，一开始花了挺大劲去猜哪个摇杆对应哪些字节，后来发现其实很好猜的。一共5个字节，2个摇杆共4个方向，所以每个方向就是10bit。一般来说10bit的AD也是相当常见的。 所以只要把这些字节读取出来，然后每10位凑成整数，就可以还原出摇杆的读数了。 在linux上连接读取BLE可以用pyblue模块，可以在树莓派上用了。 下面给出读取的测试代码： 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748from __future__ import print_functionimport structimport timefrom bluepy.btle import Peripheral# 来自(https://www.hsli.top)# 手柄的MAC地址可以通过蓝牙调试软件获得my_gamesir = Peripheral('c6:xx:xx:xx:xx:b9', 'random')services = my_gamesir.getServices()for service in services: print(service) control_service = services[3] charac_dics = control_service.getCharacteristics() for charac in charac_dics: print(charac.uuid) while True: time.sleep(0.01) charac1, charac2, charac3 = [item.read() for item in charac_dics] status_code = struct.unpack('H', charac1[:2])[0] if status_code == 50593: on_press_key = struct.unpack('I', charac1[9:13])[0] press_counter = struct.unpack('B', charac1[-1])[0] bar_status = struct.unpack('5B', charac1[2:7]) bar_status_bin = ''.join([bin(item).split('b')[1].rjust(8).replace(' ', '0') for item in bar_status]) left_drag = int(bar_status_bin[0:10], 2) left_push = int(bar_status_bin[10:20], 2) right_drag = int(bar_status_bin[20:30], 2) right_push = int(bar_status_bin[30:40], 2) print("status %s" % status_code, end=' ') print("on_press %s" % on_press_key, end=' ') print("press_counter %s" % press_counter, end=' ') print("left_drag %s" % left_drag, end=' ') print("right_drag %s" % right_drag, end=' ') print("left_push %s" % left_push, end=' ') print("right_push %s" % right_push, end='\r') # break]]></content>
+      <categories>
+        <category>硬件DIY</category>
+      </categories>
+      <tags>
+        <tag>DIY</tag>
+        <tag>蓝牙</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[树莓派pybluez填坑]]></title>
+    <url>%2F%E6%A0%91%E8%8E%93%E6%B4%BEpybluez%E5%A1%AB%E5%9D%91.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 安装pybluez安装libbluetooth-dev避免报错 sudo apt-get install libbluetooth-dev 安装pybluez sudo apt-get install pybluez 例子：pybluz 查询蓝牙123456import bluetoothprint("performing inquiry...")nearby_devices = bluetooth.discover_devices(lookup_names = True)print("found %d devices" % len(nearby_devices))for addr, name in nearby_devices: print(" %s - %s" % (addr, name)) 1、import bluetooth报错：no module named bluetooth原因及解决方法： You’ve installed the Python 2 version of the bluez bindings. Either run the script usingpython2 or install the Python 3 bindings. Since they aren’t packaged, you would need to install them using pip:python3 -m pip install pybluez 2、no module named gattlib解决方法：sudo apt-get install libboost-python-dev libboost-thread-dev libbluetooth-dev libglib2.0-dev]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[tmpfs延长树莓派内存卡寿命]]></title>
+    <url>%2Ftmpfs%E5%BB%B6%E9%95%BF%E6%A0%91%E8%8E%93%E6%B4%BE%E5%86%85%E5%AD%98%E5%8D%A1%E5%AF%BF%E5%91%BD.html</url>
+    <content type="text"><![CDATA[tmpfs延长树莓派内存卡寿命 来自https://www.hsli.top 编辑/etc/fstab加入以下行 12345tmpfs /tmp tmpfs defaults,noatime,nosuid,size=100m 0 0tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=30m 0 0tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=100m 0 0# tmpfs /var/run tmpfs defaults,noatime,nosuid,mode=0755,size=2m 0 0 树莓派 stretch版本已经弄好tmpfs /var/spool/mqueue tmpfs defaults,noatime,nosuid,mode=0700,gid=12,size=30m 0 0 将上述文件夹挂载到tmpfs并设置最大size和权限等]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[树莓派无线中继]]></title>
+    <url>%2F%E6%A0%91%E8%8E%93%E6%B4%BE%E6%97%A0%E7%BA%BF%E4%B8%AD%E7%BB%A7.html</url>
+    <content type="text"><![CDATA[树莓派无线中继 来自https://www.hsli.top 先固定设备名称编辑新增文件/etc/udev/rules.d/10-network.rules，其中的内容如下： 1SUBSYSTEM=="net", ACTION=="add", ATTR&#123;address&#125;=="aa:bb:cc:dd:ee:ff", NAME="wlan0" mac地址为相应网卡地址，可以用命令ip link查看 安装dnsmasq来设置DHCP服务 使用命令sudo apt-get install dnsmasq，编辑/etc/dnsmasq.conf，注意更改如下几段： 12interface=wlan1dhcp-range=192.168.88.50,192.168.88.150,255.255.255.0,12h 运行命令sudo service dnsmasq restart来启用 11.开启包转发Linux系统默认关闭了IP包转发，因此不能做路由器。所以需要先打开包转发 编辑/etc/sysctl.conf，去掉以下属性前的注释: 12# Uncomment the next line to enable packet forwarding for IPv4net.ipv4.ip_forward=1 运行sudo sysctl -p来启用 之后运行 1sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE 来启用wlan0端口的NAT 12.安装iptables-persistent上一步中，我们启用了一条防火墙规则，但是防火墙规则重启后就丢失了，为了能够规则开机自动加载，我们可以使用iptables-persistent。用命令sudo apt-get install iptables-persistent来安装该组件，根据其提示进行初次设置（一路确认）。该组件默认会将防火墙规则保存到/etc/iptables/rules.v4中。你可以使用如下命令保存和读入规则: 1234#保存现有规则sudo service netfilter-persistent save#读取并应用先有规则sudo service netfilter-persistent reload 为什么服务名称变成了netfilter-persistent，这里面好像有故事，留待以后再digg 13.安装第二块WIFI适配器第一块WIFI适配器是为了连接现有网络，第二块则是为了建立WIFI热点。为了建立WIFI热点，适配器必须具有AP的mode。可以使用命令iw list|grep -A10 ‘Supported interface modes’查看。比如，我选用的设备是widemac SL-1506N，其参数如下： Supported interface modes: IBSS managed AP AP/VLAN WDS monitor mesh point 该设备依然是插入即可，不需要驱动。 14.设置第二块Adapter的IP依然是编辑/etc/network/interfaces,更改wlan1的配置如下 1234auto wlan1iface wlan1 inet static address 192.168.4.1 netmask 255.255.255.0 16.安装并开启hostapdLinux启用WIFI热点，使用的是hostapd。首先，用命令sudo apt-get install hostapd安装它，然后增加配置文件/etc/hostapd/hostapd.conf如下： 12345678910111213interface=wlan1driver=nl80211ssid=ssidhw_mode=gchannel=13macaddr_acl=0auth_algs=1ignore_broadcast_ssid=0wpa=2wpa_passphrase=passwdwpa_key_mgmt=WPA-PSKwpa_pairwise=TKIPrsn_pairwise=CCMP 只需要更改其中的ssid和wpa_passphrase属性。 之后运行命令sudo hostpad -d /etc/hostapd/hostapd.conf来观察测试，没有错误可以连接，就OK了。 CTRL＋C后，编辑/etc/default/hostapd，改变DAEMON_CONF的配置如下 DAEMON_CONF=”/etc/hostapd/hostapd.conf” 之后就可以使用sudo service hostapd start 1hostapd -B /etc/hostapd/hostapd.conf 正式启动WIFI热点了，也可以将其加入/etc/rc.local的exit 0之前使其开机启动 重启，就可以看到热点了，简单好多～树莓派的wifi信号强度跟当初著名的路由玩具wr703n差不多。 连接wifi输入sudo wpa_cli启动wpa_cli的命令行界面（必须sudo）。常用的指令如下： 123456789status：列出目前的联网状态。list：列出所有备选网络。目前正连接到的网络会标[CURRENT]，禁用的网络会标[DISABLE]。add_network：增加一个备选网络，输出新网络的号码（这个号码替代下文的[network_id]）。注意新网络此时是禁用状态。set_network [network_id] ssid “Your SSID”：设置无线网的名称（SSID）set_network [network_id] key_mgmt WPA-PSK：设置无线网的加密方式为WPA-PSK/WPA2-PSKset_network [network_id] psk “Your Password”：设置无线网的PSK密码enable_network [network_id]：启用网络。启用后如果系统搜索到了这个网络，就会尝试连接。disable_network [network_id]：禁用网络。save_config：保存配置。 举个栗子： 123456789101112&gt; add_network4 &lt;--- 记住这个号码！&gt; set_network 4 ssid &apos;&quot;Your SSID&quot;&apos;OK&gt; set_network 4 key_mgmt WPA-PSKOK&gt; set_network 4 psk &quot;Your Password&quot;OK&gt; enable_network 4OK&gt; save_config &lt;--------别忘了这个，否则重启之后网络配置可能丢失OK]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu boot分区爆满导致apt dpkg报错]]></title>
+    <url>%2FUbuntu-boot%E5%88%86%E5%8C%BA%E7%88%86%E6%BB%A1%E5%AF%BC%E8%87%B4apt-dpkg%E6%8A%A5%E9%94%99.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top Ubuntu /boot分区爆满导致apt dpkh报错查看一下boot分区是否爆满，一般是由于装载了过多系统内核造成的 查看一下有哪些内核 1aptitude search ~ilinux-image 看一下当前系统使用的内核版本 1uname -r 卸载不用的内核 1sudo apt-get autoremove linux-image-3.2.0-23-generic]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[五月人倍忙]]></title>
+    <url>%2F%E4%BA%94%E6%9C%88%E4%BA%BA%E5%80%8D%E5%BF%99.html</url>
+    <content type="text"><![CDATA[五月人倍忙，感觉这就是一个亘古不变的魔咒 从大一开始，每到四五月份总是觉得日子过得特别用力。 大一大二，充斥着各种的比赛，甚至还去了远征；大三忙保研，东奔西走；如今大四了，在浪潮实习，准备要毕业答辩了，事情也不少。 自由自在是多么的奢侈和宝贵啊！以前的时候，可以和队友在楼梯间借着灯光通宵调试电路，不用去担心第二天要打起精神去面对什么什么；可以肆意骑上车子到处跑，药乡，锦绣川，怪坡，雷达站，甚至日照海边，可以说走就走；可以花上一整个下午细细擦拭和保养自行车，不会担心浪费了太多的时间；甚至可以和二十多个人骑上一个月的车跑到青海，风餐露宿。 不行了，回味太醇，回想起来没完没了的。 大概是因为，那时候，快乐来自自由，自由来自无忧，无忧，可能是因为傻吧，哈哈。 不知道从什么时候开始，日子开始变得紧巴起来，也不知道是哪里来的压力。 昨天晚上的那顿饭吃得真的挺压抑的，有点不是滋味，那个局面，那个场面，很难hold住，不知道以后还会不会有，也许还会有，虽然不好受，我还是会选择面对。我无法知道自己的做法是对是错，感觉违背了自己以前的行事方式。不过这样的决定，确实是对我有好处的。 回顾一下这几年，发生在我身上的每一次转机，无不是从艰辛的风口浪尖开始的。所谓厚积薄发，平日的积累，终究是要在风口浪尖的时刻才能决定下一段路的方向。 日子过得很用力，可是我愿意啊。有时候倒也想闲下来，放松放松。可是我怎么放松呢？ 在上坡路？我一向是如此对自己说的，可是怎么就一直在上坡呢？ 无论是对是错，这种用力过日子的感觉，让我真真切切的感觉到生活有滋有味。太闲了也不好，忙里偷闲，才是最舒服的闲。 加油吧，路漫漫其修远兮。]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>社会</tag>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Python连接Oracle数据库cx_Oracle配置]]></title>
+    <url>%2FPython%E8%BF%9E%E6%8E%A5Oracle%E6%95%B0%E6%8D%AE%E5%BA%93cx-Oracle%E9%85%8D%E7%BD%AE.html</url>
+    <content type="text"><![CDATA[Oracle是个闭源的东西，Python访问Oracle比较简便的方法貌似只有cx_Oracle了，非常蛋疼，来自https://www.hsli.top 首先安装cx_Oracle，最新版本貌似还有Bug，我安装的5.3版本，注意下载安装的时候要对应Oracle版本和Python版本，这里的Oracle版本要和稍后下载的InstantClient版本对应。直接pip安装我这里会报错，从PyPi上面搜索下载即可 装好cx_Oracle之后，下载InstantClient，一定要和之前所说的Oracle版本对应。我下载的是12.2版 下载完之后，按理说可以把InstantClient的目录加到path里面即可，但是我这里死活都跑不通 其实只需要复制几个dll即可，最基本的是oci.dll，没有这个的话直接不能import cx_Oracle，接下来需要oci的依赖包，也要复制进去 在InstantClient目录里面找到 123oci.dlloraociei12.dlloraons.dll 复制到Python\Lib\site-packages目录下即可]]></content>
+      <tags>
+        <tag>Oracle</tag>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CentOS Kettle不同字符集数据库之间中文乱码问题]]></title>
+    <url>%2FCentOS-Kettle%E4%B8%8D%E5%90%8C%E5%AD%97%E7%AC%A6%E9%9B%86%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B9%8B%E9%97%B4%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.html</url>
+    <content type="text"><![CDATA[手头有个古老的数据库来的数据源，用的是US7ASCII编码，现有的库是ZHS16GBK编码，需要在CentOS搭建的ETL服务器上完成数据导入，来自https://www.hsli.top 尝试了各种方法，主要记录如下： SSH中乱码对于Windows，需要设置环境变量NLS_LANG与数据库服务器中通过下列语句查询结果一样的编码方式 12345SQL&gt; select userenv(&apos;language&apos;) from dual;USERENV(&apos;LANGUAGE&apos;)----------------------------------------------------AMERICAN_AMERICA.ZHS16GBK 对于Linux，需要在环境变量中加入NLS_LANG参数 1vim /etc/profile 加入 1export NLS_LANG=&apos;AMERICAN_AMERICA.ZHS16GBK&apos; 并且，所用的SSH终端记得选择相应的编码方式 Kettle预览乱码Windows中通过勾选允许建议转换就可以了 Linux中就麻烦了，摸索了好久才发现 打开spoon.sh，找到JVM的启动参数段 123OPT=&quot;$OPT $PENTAHO_DI_JAVA_OPTIONS-Dfile.encoding=GBK-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -Djava.library.path=$LIBPATH -DKETTLE_HOME=$KETTLE_HOME -DKETTLE_REPOSITORY=$KETTLE_REPOSITORY -DKETTLE_USER=$KETTLE_USER -DKETTLE_PASSWORD=$KETTLE_PASSWORD -DKETTLE_PLUGIN_PACKAGES=$KETTLE_PLUGIN_PACKAGES -DKETTLE_LOG_SIZE_LIMIT=$KETTLE_LOG_SIZE_LIMIT -DKETTLE_JNDI_ROOT=$KETTLE_JNDI_ROOT&quot; 加入-Dfile.encoding=GBK参数 Kettle多表转换中批量选择允许建议转换由于Kettle有多表复制功能，自动生成各个表的转换流程，但是默认不勾选允许建议转换，此时可以用Notepad++打开所有由Kettle生成的ktr文件，查找替换&lt;lazy_conversion_active&gt;Y&lt;/lazy_conversion_active&gt;，当然是将N换成Y了 不同字符的存储长度问题中文字符集会占用更多的存储空间，一些本来足够长的varchar2字段换了字符集就不够长了 怎么办呢，我先用PL/SQL把数据库的结构导出为SQL脚本，然后将所有varchar2字段长度加长，比如说乘上3就好了 至于怎么处理这个SQL脚本，就有意思了 我写了个Python，把所有的varchar2长度都乘了3，再把这个sql脚本用PL/SQL生成数据库表结构，再用Kettle导入，就好了 Python脚本如下 1234567891011121314151617181920212223242526272829303132#coding:utf-8# private02数据库编码有些问题，转换编码之后，原来的字段长度又不够放下新的编码内容了，写了个脚本，把数据库生成脚本的所有相关字段长度都乘上3import refile = open("G:\\Inspur\\PowerDesigner\\BusinessData\\private02.sql",)pattern1 = re.compile(r'(^\s+.*?VARCHAR2\()(\d+)(\).*)')pattern2 = re.compile(r'(^\s+\S+\s+CHAR\()(\d+)(\).*)')while 1: line = file.readline() if not line: break if re.match(pattern1,line): items = re.findall(pattern1,line) updated_num = int(items[0][1])*3 updated_num = 4000 if updated_num&gt;4000 else updated_num print items[0][0],str(updated_num),items[0][2] elif re.match(pattern2,line): items = re.findall(pattern2,line) updated_num = int(items[0][1]) * 3 print items[0][0],str(updated_num),items[0][2] else: print linefile.close()]]></content>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+        <tag>编码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Oracle常用概念及命令]]></title>
+    <url>%2FOracle%E5%B8%B8%E7%94%A8%E6%A6%82%E5%BF%B5%E5%8F%8A%E5%91%BD%E4%BB%A4.html</url>
+    <content type="text"><![CDATA[由于有新数据需要入库和处理，现在需要来一波Oracle命令。之前刚刚入门，也不懂技术，现在稍微懂一点了，备份一下一些常用命令，以后再用到就不用再到处百度谷歌了，来自https://www.hsli.top 用户创建用户identified by *** ，用户的密码。 default tablespace *** 默认用户表空间。 temporary tablespace *** 默认临时空间。 123create user test identified by testdefault tablespace tsusertesttemporary tablespace tstemptest; 修改密码：12alter user testidentified by test; 删除用户以及跟用户关联的对象：1drop user test CASCADE; 授权Oralce的特殊权限 系统权限unlimited tablespace是隐含在dba, resource角色中的一个系统权限. 当用户得到dba或resource的角色时, unlimited tablespace系统权限也隐式受权给用户. 系统权限unlimited tablespace不能被授予role, 可以被授予用户. 系统权限unlimited tablespace不会随着resource, dba被授予role而授予给用户. 特殊角色 DBA角色，是授权数据库管理员的权限 CONNECT角色， 是授予最终用户的典型权利，最基本的 一个（CREATE SESSION） RESOURCE角色，是授予开发人员的 默认有八个权限（CREATE SEQUENCE,CREATE TRIGGER,CREATE CLUSTER,CREATE PROCEDURE,CREATE TYPE,CREATE OPERATOR,CREATE TABLE,CREATE INDEXTYPE） exp_full_database角色，拥有导出数据库的权限 imp_full_database角色，拥有导入数据库的权限 授权命令 1grant resource to test; 123grant select on username.tablename to user;grant create view to user;grant create table to user; 查询权限以下的查询中，基本都要以DBA的角色进行查询，如果权限不够，有可能查询不出来数据。 查看用户拥有那些角色 1select * from dba_role_privs a where a.grantee=&apos;test&apos;; 或 1select * from dba_sys_privs a where a.grantee=&apos;test&apos;; 查看角色拥有那些权限 1select ROLE, PRIVILEGE from role_sys_privs where role=&apos;RESOURCE&apos;; --RESOURCE，CONNECT，DBA 或 1select grantee,privilege from dba_sys_privs where grantee=&apos;RESOURCE&apos;; 收回角色 12revoke resource from test;revoke select username.tablename from user; 收回权限 1revoke unlimited tablespace from test; 查看Oracle的版本号 1select * from v$version where rownum &lt;=1; 表空间创建表空间创建 1create tablespace private_db datafile &apos;/export/DataBase/data/private_db01.dbf&apos; size 1G;&apos; 创建大文件表空间 1create bigfile tablespace private_db datafile &apos;/export/DataBase/data/private_db.dbf&apos; size 2G; 分配给用户 1alter user private_db default tablespace private_db; 修改数据文件大小 1alter database datafile &apos;/export/DataBase/data/private_db01.dbf&apos; resize 2G; 由于涉及IO，每弄一次数据文件都超级慢啊！！！ 可以自动扩展 删除表空间，数据对象和OS文件 1drop tablespace private_db including contents and datafiles; 设置数据文件自动扩展 1alter database datafile &apos;/export/DataBase/data/private_db01.dbf&apos; autoextend on next 200M maxsize unlimited; 对于大文件表空间，只有一个数据文件，也可以设置表空间自动扩张来设置数据文件自动扩展 1alter tablespace private_db autoextend on next 500M maxsize unlimited; 查询表空间 查看当前用户的缺省表空间 1SQL&gt;select username,default_tablespace from user_users; 查看当前用户的角色 1SQL&gt;select * from user_role_privs; 查看当前用户的系统权限和表级权限 12SQL&gt;select * from user_sys_privs;SQL&gt;select * from user_tab_privs; 查看用户下所有的表 1SQL&gt;select * from user_tables; 修改表空间存储路径（Oracle中数据文件是按照表空间来区分的） 查看数据文件的存储路径： 1234567SQL&gt; select name from v$datafile;NAME--------------------------------------------------------------------------------/u01/oracle/oradata/yoon/system01.dbf/u01/oracle/oradata/yoon/sysaux01.dbf/u01/oracle/oradata/yoon/undotbs01.dbf/u01/oracle/oradata/yoon/users01.dbf 修改表空间为offline： 12SQL&gt; alter tablespace users offline;Tablespace altered. 拷贝数据文件 1$ cp users01.dbf /u01/oracle/oradata/yoondata/ 修改表空间存储路径 12SQL&gt; alter tablespace users rename datafile &apos;/u01/oracle/oradata/yoon/users01.dbf&apos; to &apos;/u01/oracle/oradata/yoondata/users01.dbf&apos;;Tablespace altered. 修改表空间为online 12SQL&gt; alter tablespace users online;Tablespace altered. 重新查看数据文件路径 1234567SQL&gt; select name from v$datafile;NAME--------------------------------------------------------------------------------/u01/oracle/oradata/yoon/system01.dbf/u01/oracle/oradata/yoon/sysaux01.dbf/u01/oracle/oradata/yoon/undotbs01.dbf/u01/oracle/oradata/yoondata/users01.dbf 表 查看用户下所有的表 1SQL&gt;select * from user_tables; 查看名称包含log字符的表 1SQL&gt;select object_name,object_id from user_objects where instr(object_name,&apos;LOG&apos;)&gt;0; 查看某表的创建时间 1SQL&gt;select object_name,created from user_objects where object_name=upper(&apos;&amp;table_name&apos;); 查看某表的大小 1SQL&gt;select sum(bytes)/(1024*1024) as &quot;size(M)&quot; from user_segments where segment_name=upper(&apos;&amp;table_name&apos;); Drop掉的表恢复 今天一不小心把库里一个500W数据量的表drop掉了，吓得半死，上网一查，有方法恢复的 查看回收站 123SQL&gt;show recyclebin;ORIGINAL NAME RECYCLEBIN NAME OBJECT TYPE DROP TIMETEST_DROP BIN$b+XkkO1RS5K10uKo9BfmuA==$0 TABLE 2005-05-07:14:30:47 恢复 1SQL&gt;flashback table test_drop to before drop 锁 用dba权限的用户查看数据库都有哪些锁 1select t2.username,t2.sid,t2.serial#,t2.logon_time from v$locked_object t1,v$session t2 where t1.session_id=t2.sid order by t2.logon_time; 根据sid查看具体的sql语句，如果sql不重要，可以kill 1select sql_text from v$session a,v$sqltext_with_newlines b where DECODE(a.sql_hash_value, 0, prev_hash_value, sql_hash_value)=b.hash_value and a.sid=&amp;sid order by piece; 输入SID即可查询 kill该事务 1alter system kill session &apos;339,13545&apos;; 视图创建视图 123456create or replace view nsrxx_limited asselect &quot;NSRMC&quot;,&quot;NSRZT_DM&quot;,&quot;PROVINCE&quot; from (select nsrmc,nsrzt_dm,&apos;河南&apos; as province from DJ_NSRXX t1union allselect nsrmc,nsrzt_dm,&apos;四川&apos; as province from DJ_NSRXX_LS_SICHUAN t2);]]></content>
+      <tags>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu添加快捷方式]]></title>
+    <url>%2FUbuntu%E6%B7%BB%E5%8A%A0%E5%BF%AB%E6%8D%B7%E6%96%B9%E5%BC%8F.html</url>
+    <content type="text"><![CDATA[Ubuntu添加快捷方式 来自https://www.hsli.top 以Pycharm为例 终端输入：1sudo gedit /usr/share/applications/Pycharm.desktop 粘贴模板： 123456789[Desktop Entry]Type=ApplicationName=PycharmGenericName=Pycharm3Comment=Pycharm3:The Python IDEExec=sh /opt/pycharm/bin/pycharm.shIcon=/opt/pycharm/bin/pycharm.pngTerminal=pycharmCategories=Pycharm; 其中pycharm.sh和pycharm.png分别指向Pycharm解压目录的pycharm.sh和pycharm.png 保存后，即可在搜索栏找到PyCharm]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CentOS 6.7简单安装JDK1.8]]></title>
+    <url>%2FCentOS-6-7%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85JDK1-8.html</url>
+    <content type="text"><![CDATA[这里提供最迅速的安装JDK的方法, 来自https://www.hsli.top 下载去官网下载JDK的tar.gz格式的压缩包 上传解压用WinSCP把压缩包上传到服务器要装jdk的目录下，比如/usr/local/jdk1.8 解压 1# tar xvf jdk-* 设置环境变量修改/etc/profile 在最后加上 12345JAVA_HOME=/usr/local/java/jdk1.8.0_121JRE_HOME=/usr/local/java/jdk1.8.0_121/jreCLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/libPATH=$JAVA_HOME/bin:$PATHexport PATH JAVA_HOME CLASSPATH 注意等号两侧不能加入空格，然后source /etc/profile生效]]></content>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Linux</tag>
+        <tag>JDK</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Oracle修改归档文件和数据文件位置]]></title>
+    <url>%2FOracle%E4%BF%AE%E6%94%B9%E5%BD%92%E6%A1%A3%E6%96%87%E4%BB%B6%E5%92%8C%E6%95%B0%E6%8D%AE%E6%96%87%E4%BB%B6%E4%BD%8D%E7%BD%AE.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top Linux硬盘规划首先分析一下linux的硬盘规划 可见分配的/export目录才是挂载的硬盘，数据文件等等应该放在这个位置 root登录创建文件夹，分配给用户，用groups命令查看当前用户所属组 修改archive路径sysdba登录，查看闪回路径 1234567SQL&gt; show parameter db_recoveryNAME TYPE VALUE------------------------------------ ----------- ------------------------------db_recovery_file_dest string /opt/oracle/flash_recovery_are adb_recovery_file_dest_size big integer 3882M 可见闪回路径的目录和大小限制 修改闪回路径 123SQL&gt; alter system set log_archive_dest_1=&apos;location=/export/DataBase/archives&apos;;System altered. 注意该目录需要有oracle用户权限 完了之后重启数据库，查看是否修改成功 1234567SQL&gt; archive log list;Database log mode Archive ModeAutomatic archival EnabledArchive destination /export/DataBase/archivesOldest online log sequence 1491Next log sequence to archive 1493Current log sequence 1493 切换日志试一下看有没有新的归档日志文件产生 1234567SQL&gt; alter system switch logfile;System altered.SQL&gt; exitDisconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit ProductionWith the Partitioning, OLAP, Data Mining and Real Application Testing options 跑到那个目录下面看一下，有新的归档日志文件了 归档日志路径设置规则1select v.&quot;NAME&quot;,v.&quot;VALUE&quot;,v.&quot;DESCRIPTION&quot; from v$parameter v 看一下，可以看到有很多和归档相关的目录，大致分为三类 log_archive_dest 指定归档文件存放路径 log_archive_dest_n oracle最多支持归档文件放在10个地方，n从1到10 db_recovery_file_dest 指定闪回恢复区路径 总体而言，log_archive_dest_n的优先级最高，如果设置了他，db_recovery_file_dest设置了也不起作用，log_archive_dest不能设置，如果设置了db_recovery_file_dest，就不能设置log_archive_dest，如果设置了log_archive_dest另外亮着都不能设置。。。表示很无语 如果设置了DB_RECOVERY_FILE_DEST，就不能设置LOG_ARCHIVE_DEST，默认的归档日志存放于DB_RECOVERY_FILE_DEST指定的闪回恢复区中。可以设置LOG_ARCHIVE_DEST_n，如果这样，那么归档日志不再存放于DB_RECOVERY_FILE_DEST中，而是存放于LOG_ARCHIVE_DEST_n设置的目录中。如果想要归档日志继续存放在DB_RECOVERY_FILE_DEST中，可以通过如下命令： 1alter system set log_archive_dest_1=’location=USE_DB_RECOVERY_FILE_DEST’; 如果设置了LOG_ARCHIVE_DEST，就不能设置LOG_ARCHIVE_DEST_n和DB_RECOVERY_FILE_DEST。如果设置了LOG_ARCHIVE_DEST_n，就不能设置LOG_ARCHIVE_DEST。也就是说，LOG_ARCHIVE_DEST参数和DB_RECOVERY_FILE_DEST、LOG_ARCHIVE_DEST_n都不共存。而DB_RECOVERY_FILE_DEST和LOG_ARCHIVE_DEST_n可以共存。 LOG_ARCHIVE_DEST只能与LOG_ARCHIVE_DUPLEX_DEST共存。这样可以设置两个归档路径。LOG_ARCHIVE_DEST设置一个主归档路径，LOG_ARCHIVE_DUPLEX_DEST设置一个从归档路径。所有归档路径必须是本地的。 如果LOG_ARCHIVE_DEST_n设置的路径不正确，那么Oracle会在设置的上一级目录归档。比如设置LOG_ARCHIVE_DEST_1=’location=C:\archive1’，而OS中并没有archive1这个目录，那么Oracle会在C盘归档。 移动数据库文件关库 1234567SQL&gt; shutdown immediate;Database closed.Database dismounted.ORACLE instance shut down.SQL&gt; exitDisconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit ProductionWith the Partitioning, OLAP, Data Mining and Real Application Testing options 移动（复制）数据库文件到目标路径 1[oracle@SDJN-VM-LINUX-85 ~]$ cp /opt/oracle/oradata/BIZDB/users01.dbf /export/DataBase/data/users01.dbf 重新挂载，修改 1234567891011121314151617181920[oracle@SDJN-VM-LINUX-85 ~]$ sqlplus / as sysdbaSQL*Plus: Release 11.2.0.1.0 Production on Thu Apr 6 11:16:15 2017Copyright (c) 1982, 2009, Oracle. All rights reserved.Connected to an idle instance.SQL&gt; startup mountORACLE instance started.Total System Global Area 6680915968 bytesFixed Size 2213936 bytesVariable Size 3556771792 bytesDatabase Buffers 3087007744 bytesRedo Buffers 34922496 bytesDatabase mounted.SQL&gt; alter database rename file &apos;/opt/oracle/oradata/BIZDB/users01.dbf&apos; to &apos;/export/DataBase/data/users01.dbf&apos;;Database altered. 打开数据库 123SQL&gt; alter database open;Database altered. 查看一下 12345678SQL&gt; select name from v$datafile;NAME--------------------------------------------------------------------------------/opt/oracle/oradata/BIZDB/system01.dbf/opt/oracle/oradata/BIZDB/sysaux01.dbf/opt/oracle/oradata/BIZDB/undotbs01.dbf/export/DataBase/data/users01.dbf 真是个伤筋动骨的操作啊]]></content>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Linux</tag>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[PowerDesigner快速创建数据库]]></title>
+    <url>%2FPowerDesigner%E5%BF%AB%E9%80%9F%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93.html</url>
+    <content type="text"><![CDATA[利用PowerDesigner可以快速创建数据库表结构，把关注点放在表和模型的架构上而不是SQL语句上，由于用PowerDesigner创建数据库结构的文章网上不一而足，本文主要讲一些重要概念和主要步骤，来自https://www.hsli.top 创建过程打开Powerdesigner，file-&gt;new&gt;Physical Date创建物理模型 打开后右边Toolbox中用Table工具创建表， 建好一个表之后，双击打开在Column中添加字段，Name处填写字段名，可以为中文，Code里面是字段代码，只能是英文，后面可以勾选P定为主键。 两张表之间如果有引用关系，可以用右侧Reference工具从子表拖往主表，即可创建连接关系，这些都很简单 一些概念主键一个表中用来区分唯一记录的字段，主键必须唯一而且非空，不然就没法区分2条记录了 外键代表从属关系，外键可以为空，外键如果有值一定要在其引用表中能找到相应记录，他要么不贴标签（外键为空），一旦贴上标签一定要注明是谁的（有响应主表记录），当然外键也可以重复（一个主可以有多个从属） 生成SQL脚本表结构创建完成之后可以生成SQL脚本来创建数据库，其实打开脚本来看的话，里面无非就是创建表，创建约束关系的SQL语句。 点击Database-&gt;Database Generation选择目录，起个名字生成SQL脚本。 如果引用关系很复杂的话，可能会导致生成过程报错，这是因为表名太长，导致一些键约束关系重名，可以右键选择错误，然后自动修复即可 创建完成后，可以将SQL脚本上传到数据库服务器用sqlplus执行@脚本名来执行里面的SQL语句创建数据库，也可以复制粘贴到PL\SQL中执行 细节表名称自动添加到注释新建表之后可以用中文为表命名，但是生成的SQL语句中当然是以英文的Code来命名数据表，这就导致了有注释意义的中文表名丢失，可以用如下脚本将表名添加到表注释里，在Powerdesigner用快捷键Ctrl+Shift+X可以打开脚本执行窗口，粘贴如下脚本代码即可 123456789101112131415161718192021222324252627282930313233343536373839404142434445Option ExplicitValidationMode = TrueInteractiveMode = im_BatchDim mdl ' the current model' get the current active modelSet mdl = ActiveModelIf (mdl Is Nothing) Then MsgBox "There is no current Model "ElseIf Not mdl.IsKindOf(PdPDM.cls_Model) Then MsgBox "The current model is not an Physical Data model. "Else ProcessFolder mdlEnd If' This routine copy name into comment for each table, each column and each view' of the current folderPrivate sub ProcessFolder(folder) Dim Tab 'running table for each Tab in folder.tables if not tab.isShortcut then tab.comment = tab.name Dim col ' running column for each col in tab.columns col.comment= col.name next end if next Dim view 'running view for each view in folder.Views if not view.isShortcut then view.comment = view.name end if next ' go into the sub-packages Dim f ' running folder For Each f In folder.Packages if not f.IsShortcut then ProcessFolder f end if Nextend sub]]></content>
+      <tags>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+        <tag>Power Designer</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[清除和禁用archivelog解决ORA-00257]]></title>
+    <url>%2F%E6%B8%85%E9%99%A4%E5%92%8C%E7%A6%81%E7%94%A8archibelog%E8%A7%A3%E5%86%B3ORA-00257.html</url>
+    <content type="text"><![CDATA[昨晚导了一晚上的数据，满以为一觉醒来就导完了，结果早上来到公司一看，Kettle卡住了，现在解决一下这个问题, 来自https://www.hsli.top PL\SQL也连不上了，提示ORA-00257:archiver error，一查，原来是Archivelog满了。。。。 查看archivelog方法： 123SQL&gt; set linesize 300SQL&gt; set pagesize 30SQL&gt; select * from V$FLASH_RECOVERY_AREA_USAGE; 去到/opt/oracle/flash_recovery_area/实例名/archivelog目录下一看，我滴乖乖，从数据库创建之日起，一直记录到昨晚，昨晚导好几百万条数据，难怪满了。 由于之前的记录都是导数据过程中的瞎折腾，没什么意义，就直接删掉了都。 然后RMAN更新一下，以oracle用户身份登录 1234567$ rman target / //如有多个实例此时执行rman target 用户名/密码@实例名RMAN&gt; list archivelog all; //列出所有的归档日志文件RMAN&gt; crosscheck archivelog all; //与物理归档日志文件保持同步，之前移走了一部分文件，因此执行此命令后会在/oracle目录下找不到的归档日志标记为expiredRMAN&gt; list expired archivelog all; //列出所有expired（过期）的归档日志文件，此时你就可看到移走的归档日志文件均被标记为expiredRMAN&gt; delete expired archivelog all; //在oracle中删除所有过期的expired文件RMAN&gt; list archivelog all; //再列出所有的归档日志文件，就可发现移走的日志文件被删掉了RMAN&gt; exit //退出 由于在导入数据过程中暂时不需要备份，所以关掉归档模式，导完之后一定要记得重新打开。先以sysdba身份登录数据库，关归档模式命令如下： 关库 1234SQL&gt; shutdown immediate;Database closed.Database dismounted.ORACLE instance shut down. mount数据库 123456789SQL&gt; startup mount;ORACLE instance started.Total System Global Area 3423965184 bytesFixed Size 2180544 bytesVariable Size 2013268544 bytesDatabase Buffers 1392508928 bytesRedo Buffers 16007168 bytesDatabase mounted. 关闭归档模式 12345678910SQL&gt; alter database noarchivelog; // 打开归档用这个alter database archivelogDatabase altered.SQL&gt; archive log list;Database log mode No Archive ModeAutomatic archival DisabledArchive destination USE_DB_RECOVERY_FILE_DESTOldest online log sequence 228Current log sequence 230 启动数据库 12SQL&gt; alter database open;Database altered.]]></content>
+      <tags>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+        <tag>日志</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CentOS Linux远程Oracle解决中文乱码问题]]></title>
+    <url>%2FCentOS-Linux%E8%BF%9C%E7%A8%8BOracle%E8%A7%A3%E5%86%B3%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.html</url>
+    <content type="text"><![CDATA[准备导数据了，可是试了一下，在服务器上加一条中文条目，客户端显示乱码，老扎心了，来自https://www.hsli.top 有下列几个地方需要设置得一致 1SQL&gt; select userenv(&apos;language&apos;) from dual; Oracle用户目录下的.bash_profile里面有一行1export NLS_LANG=`AMERICAN_AMERICA.ZHS16GBK` 没有的话自己加上 本地Oracle client的注册表项regedit -&gt;HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ORACLE\KEY_OraClient12Home1_32bit-&gt;NLS_LANG 以及本地环境变量NLS_LANG 别的都好该，唯独第一个地方最不好改了，下面的方法来改： 12345678910111213SQL&gt; shutdown immediateSQL&gt; startup mountSQL&gt; alter system enable restricted session;SQL&gt; alter system set job_queue_processes=0;SQL&gt; alter system set aq_tm_processes=0;SQL&gt; alter database open;SQL&gt; alter database character set zhs16gbk; 这里会报错，不用管 1SQL&gt; alter database character set internal_use zhs16gbk; 查看一下搞成了没 123456789101112131415161718192021222324252627282930SQL&gt; set linesize 200;SQL&gt; set pagesize 20;SQL&gt; select * from v$nls_parameters;PARAMETER VALUE---------------------------------------------------------------- ----------------------------------------------------------------NLS_LANGUAGE AMERICANNLS_TERRITORY AMERICANLS_CURRENCY $NLS_ISO_CURRENCY AMERICANLS_NUMERIC_CHARACTERS .,NLS_CALENDAR GREGORIANNLS_DATE_FORMAT DD-MON-RRNLS_DATE_LANGUAGE AMERICANNLS_CHARACTERSET `ZHS16GBK`NLS_SORT BINARYNLS_TIME_FORMAT HH.MI.SSXFF AMNLS_TIMESTAMP_FORMAT DD-MON-RR HH.MI.SSXFF AMNLS_TIME_TZ_FORMAT HH.MI.SSXFF AM TZRNLS_TIMESTAMP_TZ_FORMAT DD-MON-RR HH.MI.SSXFF AM TZRNLS_DUAL_CURRENCY $NLS_NCHAR_CHARACTERSET AL16UTF16NLS_COMP BINARYPARAMETER VALUE---------------------------------------------------------------- ----------------------------------------------------------------NLS_LENGTH_SEMANTICS BYTENLS_NCHAR_CONV_EXCP FALSE19 rows selected. 干成了]]></content>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+        <tag>中文编码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CentOS VNC远程桌面]]></title>
+    <url>%2FCentOS-VNC%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2.html</url>
+    <content type="text"><![CDATA[需要利用服务器网络的稳定性，要远程操作浏览器等窗口软件，所以要安装桌面环境，记录一些这个CentOS的优化过程，来自https://www.hsli.top 系统环境CentOS 6.7 32bit 一些可能会用得上的命令由于一开始的时候脑抽，想用X11来看窗口，后来想想似乎不行，因为要在校园网或者公司网等环境使用，没有端口转发，白搭，因此要卸掉装好的X11支持 12345yum list installed | grep xdmyum remove xorg-x11-xdm.i686yum list installed | grep xtermyum remove xterm.i686 创建新用户为了安全起见，创建一个非root用户 12# adduser XXXXX# passwd XXXXX 授权 123[root@VM_59_147_centos ~]# sudoers-bash: sudoers: command not found[root@VM_59_147_centos ~]# whereis sudoers 找到sudoers在哪里 123sudoers: /etc/sudoers /etc/sudoers.d /usr/libexec/sudoers.so /usr/share/man/man5/sudoers.5.gz[root@VM_59_147_centos ~]# ls -l /etc/sudoers-r--r-----. 1 root root 4002 Mar 2 2012 /etc/sudoers 只有只读权限,加权限 123[root@VM_59_147_centos ~]# chmod -v u+w /etc/sudoersmode of `/etc/sudoers&apos; changed to 0640 (rw-r-----)[root@VM_59_147_centos ~]# vim /etc/sudoers 在下面添加新增的用户123## Allow root to run any commands anywhereroot ALL=(ALL) ALLhosea1008 ALL=(ALL) ALL 安装Xfce先看下有没有 12[root@VM_59_147_centos ~]# yum grouplist | grep Xfce Xfce 第一次没找到，居然是区分大小写的，什么鬼。。。。 装上 1yum groupinstall Xfce 没想到CentOS 6.7比7安装慢这么多。。。不知道是不是因为我选了32位的系统，可是我的VPS一共就1G内存，多少位应该没关系吧。。。 安装中文支持 本来CentOS 6应该是yum groupinstall chinese-support这么安装的，但是报了个错，关于源的，懒得更新源，就按照CentOS 7的方法装个字体支持得了 1[root@VM_59_147_centos ~]# yum install cjkuni-ukai-fonts 安装VNC12yum install tigervncyum install tigervnc-server 这个vnc真的好小啊，我喜欢 第一次启动会要设置密码 123[root@VM_59_147_centos ~]# vncserver[root@VM_59_147_centos ~]# vncserver -kill :1Killing Xvnc process ID 11200 配置装个浏览器吧 12[root@VM_59_147_centos ~]# clear[root@VM_59_147_centos ~]# yum install firefox 我的空间啊。。。 1[root@VM_59_147_centos ~]# vim /etc/sysconfig/vncservers 在最后加入下面的 12VNCSERVERS=&quot;1:root&quot;VNCSERVERARGS[1]=&quot;-geometry 800x600 &quot; 防火墙别忘了1vim /etc/sysconfig/iptables 加上-A INPUT -p tcp -m state --state NEW -m tcp --dport 5901 -j ACCEPT 可以用service vncserver start的方式来启停vnc了 开机启动chkconfig vncserver on我就不弄了 上述设置之后，启动VNC（记得IP地址后面加上端口哦）看到的是没有内容的桌面，莫方 切到自己用户目录里面的.vnc目录下，修改xstartup文件 1[hosea1008@VM_59_147_centos .vnc]$ vim xstartup 全部删掉，改成下面的 1234567891011#!/bin/sh# Uncomment the following two lines for normal desktop:unset SESSION_MANAGER#exec /etc/X11/xinit/xinitrc[ -x /etc/vnc/xstartup ] &amp;&amp; exec /etc/vnc/xstartup[ -r $HOME/.Xresources ] &amp;&amp; xrdb $HOME/.Xresourcesxsetroot -solid greyvncconfig -iconic &amp;#xterm -geometry 80x24+10+10 -ls -title &quot;$VNCDESKTOP Desktop&quot; &amp;#twm &amp;startxfce4 &amp; 重启vnc服务，就可以了。 漂亮，忍不住贴张图 另一种方法安装X Window System和Gnome桌面系统 12# yum groupinstall &apos;X Window System&apos;# yum groupinstall Desktop 装好VNC，设置好防火墙之后，直接开跑就可以]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Linux</tag>
+        <tag>VNC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CentOS Oracle远程访问]]></title>
+    <url>%2FCentOS-Oracle%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 本地学会了用Power Designer建立表，连接Oracle建立数据库之后，要求建到服务器上 登录数据库服务器启动Oracle登录到CentOS，切换到su 输入：123# su - oracle# sqlplusSQL&gt; startup 开启CentOS的1521端口12345//查看开放端口netstat -ntlp//查看端口策略service iptables statusiptables -L -n cd到/etc/sysconfig下 1vim iptables 加入1-A INPUT -p tcp -m state --state NEW -m tcp --dport 1521 -j ACCEPT 退出vim，重启iptables服务，再查看一下端口策略，看到1521已经开放 创建oracle实例启动监听首先要解决一个图形界面的问题因为oracle有图形界面，而一般我们用putty登录服务器，都是命令行，所以先要能够在本地看懂啊服务器上运行的软件的图形界面 使用oracle账户登录 远程服务器上安装俩东西 12yum install openssh-serveryum install xbase-clients //(貌似我忘了安，也可以？) 创建一个Xming的桌面快捷方式，修改属性加上-ac参数，修改后如下 1&quot;E:\Program Files (x86)\Xming\Xming.exe&quot; :0 -clipboard -multiwindow -ac 本地下载安装Xming客户端（我搞了一个在百度云上），这玩意儿官网在这里[ Xming] 启动putty之后，输入主机IP，端口，用户名密码什么的就不赘述了 菜单左边Connection-&gt;data-&gt;Auto-login username这里输入登录名可以设定默认登录账户 菜单左边Connection-&gt;SSH-&gt;X11，勾选上Enable X11 forwarding就可以看到远程图形界面了，666啊 创建数据库实例设定环境变量1234export LANG=enUS //英文，避免乱码//export DISPLAY=你的IP:0.0 这一步第一次尝试的时候要求设置DISPLAY环境变量，但是后来登录就好像不用？//等号两边别加空格，你以为哪里都是写程序啊dbca //打开Database Configuration Assistant 接下来就像本地创建数据库一样了，有图形界面Next-.Create a Database-&gt;General Purose...-&gt;名称和SID-&gt;Next-&gt;口令-&gt;Next-&gt;Enable Archiving-&gt;Next-&gt;内存大小-&gt;Next...-&gt;创建数据库生成脚本 启动并连接本地启动连接，很简单的1234SQL&gt; conn /as sysdbaSQL&gt; startupSQL&gt; alter user scott account unlock;SQL&gt; alter user scott identified by *****; 远程连接好吧这个问题我TM搞了2天 其实很简单，打开netmgr配置监听器，IP地址 配置数据库服务 我不知道这些是不是必须的，反正我这样弄就行了 此前试过了无数重复类似的操作，包括文哥也给了我很多建议，他自己也说，这玩意儿配置起来10次挂8次，我* 当然，这样简单配置之后是不行的，要保存设置，重启lsnrctl 1234$ lsnrctl start // Start listener instance$ echo $ORACLE_SID //Check which instance is to be started，其实这个可以写入`/home/oracle`下面那个什么bash什么的，具体我就先不说了$ export ORACLE_SID=BizDB //Switch instance to started$ sqlplus /nolog //Login 当然，这样之后也是不可以的，我就在这里停留了2天。。。 然后，我发现，我把centos的防火墙关掉，就可以了，就可以了，，就可以了，，，， 我TM不是打开1521端口了吗？难道我开的是假端口？ 好了，远程连接有个简单连接命令 1username/password@IP:port/service_name TM成功了，先平复一下我激动的心情，看一下可不可以不关防火墙也连的上 好吧，怪我孤陋寡闻，读不懂iptables里面写的什么东东，反正是把开放1521端口的那一句放到最顶上（据说优先级由上到下），就TM可以了 当天晚上公司修复服务器，重启了服务器 第二天来上班的时候，TM又双叒叕连不上了。。。。 提示 12345Connecting to (ADDRESS=(PROTOCOL=tcp)(HOST=)(PORT=1521))TNS-12541: TNS:no listener TNS-12560: TNS:protocol adapter error TNS-00511: No listener Linux Error: 111: Connection refused 好吧，上网一查，原来是昨天改了好多东西，连host都改了，只要恢复原样就可以了 把host改回 1127.0.0.1 localhost.localdomain localhost 即可（我能说公司服务器原来的host就不是这样的吗。。。）]]></content>
+      <tags>
+        <tag>CentOS</tag>
+        <tag>Linux</tag>
+        <tag>Oracle</tag>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Git命令笔记]]></title>
+    <url>%2FGit%E5%91%BD%E4%BB%A4%E7%AC%94%E8%AE%B0.html</url>
+    <content type="text"><![CDATA[本笔记记录一些用过的Git命令，来自https://www.hsli.top 初始化等操作转到要备份的文件夹，打开Git Bash1234567git initecho “# XXXX” &gt;&gt; README.mdgit statusgit add .git commit -m “first commit”git remote add origin https://git.coding.net/hosea1008/XXXXX.gitgit push -u origin master 在.gitignore文件里列出目录或文件，这些目录和文件将不会被备份 危险操作 本地回退版本 git reset --hard d619fca76... 回退提交到远程 git push --force 删除远程目录 git rm -r --cached foldername 然后push 分支操作分支操作有利于区分不同的工作思路，到项目终结的时候再merge到master分支，这样做更加安全 命令： 查看分支：git branch 创建分支：git branch &lt;name&gt; 切换分支：git checkout &lt;name&gt; 创建+切换分支：git checkout -b &lt;name&gt; 合并某分支到当前分支：git merge &lt;name&gt; 删除本地已合并分支：git branch -d &lt;name&gt; 删除本地未合并分支（未经测试）：git branch -D &lt;name&gt; 删除远程分支：git push origin :&lt;name&gt; 注意 如果要push新分支上去的话，需要先来一遍git push --set-upstream origin &lt;name&gt; 上文&lt;name&gt;不用引号括号等等，可以有.符号 pull操作 git fetch先获取，比较，再合并 123git fetch origin master:tmpgit diff tmpgit merge tmp git pull获取直接merge到本地 1git pull origin master Git迁移从一个git仓库迁移到另一个仓库，带着所有的commit历史记录 从源地址clone一份裸版本库 1git clone --bare https://git.coding.net/hosea1008/ElectronicStethoscope-Client.git 到新的git服务器上创建一个新仓库（似乎可以与源仓库不同名？我这里为了好记，没改名字尝试） 然后cd到clone下了的目录里面，以镜像方式推送到新的git仓库里 1git push --mirror git@github.com:hosea1008/ElectronicStethosope-Client.git 至于clone下来的代码，爱咋咋地了]]></content>
+      <categories>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Matlab查询判断串口是否可用的方法]]></title>
+    <url>%2FMatlab%E6%9F%A5%E8%AF%A2%E5%88%A4%E6%96%AD%E4%B8%B2%E5%8F%A3%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8%E7%9A%84%E6%96%B9%E6%B3%95.html</url>
+    <content type="text"><![CDATA[网上现有的很多Matlab串口通讯代码都是从打开串口开始的，首先需要知道该COM口是否有用，网上尚未有Matlab判断串口是否可用的方法，本文提供一种方法，来自https://www.hsli.top 首先用instrhwinfo获得电脑上的串口信息，里面包含有可用串口的端口号，然后把获得的cell数组转为字符串就可以获得端口号了，再创建串口，代码如下 123456clearclcdelete(instrfindall)info = instrhwinfo(&apos;serial&apos;);str = char(info.SerialPorts(1));s = serial(str) 弊端是只能查询到端口号最小的串口，但是对于大多数应用场景已经足够了。可以根据拿到的cell数组在GUI中把可用串口列出来，我对GUI不是很熟悉，希望有网友提供相应方法。 本方法原创，转载请注明出处]]></content>
+      <categories>
+        <category>编程语言</category>
+      </categories>
+      <tags>
+        <tag>Matlab</tag>
+        <tag>串口</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu上搭建Hexo博客环境]]></title>
+    <url>%2FUbuntu%E4%B8%8A%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2%E7%8E%AF%E5%A2%83.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 安装Git1sudo apt-get install git 安装g++编译器1sudo apt-get install build-essential 安装Node.js去[ Node官网]下载源代码 解压到某一目录 进入目录打开终端 123./configuremakesudo make install make要相当长的一段时间 执行命令node -v看看是否装好了 安装npm1sudo apt-get install npm 安装Hexo1sudo npm -install -g hexo 跑到Git上备份好的博客源代码，复制地址，clone下来到你自己的目录 不知道怎么备份？看本博客以前的文章 12cd MyBloggit clone https://git.coding.net/hosea1008/BlogSourceCode.git 如果像我这样备份在coding上的私有仓库的话，要输入coding的用户名和密码 生成切记，这里不要执行hexo init哦，因为我们不是要新建博客 12hexo ghexo server 打开http://localhost:4000就可以预览博客了 与Windows共同维护博客首先在你的Ubuntu上生成好ssh密钥，教程在这里[Connecting to GitHub with SSH] 应该是每一台你使用的机器都有一个密钥，现在终于理解公钥和私钥的策略了，配置好之后，就可以hexo deploy了，不要忘记备份博客源文件，换到另一台主机之后，pull下来源文件，修改好之后再如法炮制即可]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Ubuntu</tag>
+        <tag>博客</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[朝九晚五与浪迹天涯]]></title>
+    <url>%2F%E6%9C%9D%E4%B9%9D%E6%99%9A%E4%BA%94%E4%B8%8E%E6%B5%AA%E8%BF%B9%E5%A4%A9%E6%B6%AF.html</url>
+    <content type="text"><![CDATA[How many roads must a man walk down, before they can call him a man. 偶然发现，我的骑行头盔上已经蒙了相当厚的一层灰尘，才突然想起，我已经封车一年多了。曾经伴我翻山越岭的老驴子，如今安上软软的后座，载着女友温婉地穿梭于校园，只有已经泛白的十八号车贴，还记得老驴子曾经是一辆远征车。 其实还是会在某个瞬间，想起那些熠熠生辉的时光。 三年前的篝火晚会，黄河边；两年前的高原，藏民和青海湖；一年前的沂蒙山区和大海… 这一年以来，和女友过着另一种温文尔雅，涓涓流淌的生活。 或许，这才应该是生活的常态吧。变数还是会偶然发生，比如前段时间南北奔波忙保研的时候。尽管那段时间的每一个抉择和取舍都会影响一生，但是心里却把那段日子归为了平淡的分类。 连我自己都惊讶于自己的这种变化。前段时间看了书也看了电影《从你的全世界路过》，我想如果是以前的我大概会看得心潮澎湃吧，而如今我竟然觉得那种故事有点荒唐。 也许可以说是我心态变老了吧，是的，我大四了啊，我今年都22岁了。人们常说，时光磨平了每个人的棱角，我倒觉得这不是可悲也不是可笑，而是一个人应该担负起的责任。 该是为以后的生活做打算了，正如龙舟一文所说的，生活就就像浪潮一样推着人们兜兜转转地往前走。保研前的一段时间我尝试过去找工作，在保研和一份还不错的offer之间徘徊的时候，我开始意识到，我该关注的话题应该是行业，发展，生活和安家，而不再是青春，疯狂，热血和浪漫了。 生活终究是要归于平静的。《平凡的世界》里，金波带着半生的牵挂和沧桑回到那片青海大草原，终究还是把那些青春的故事永远埋在了心底；王满银浪迹半生，终究还是回到了平凡的家乡。 世界之大，人之渺小。 每一种精神都可以用不同的行为来寄托，也许不能行走跨过山河大海，我们仍然可以在娴静的午后把玩人间草木，岁朝清供啊。 在什么时候，就做什么时候该做的事情，我觉得这才是应有的负责和姿态吧。男人们穿上统一的紧绷的西装，用领带束缚住自己的狂野，把自己削得像统一的活字一样镶嵌进社会这篇大文章里。 是的，男人们每一个人都曾经是男生，都曾经有过大大小小的荒诞，狂野和激情。但是如今，他们肩负着家庭和妻子的期盼，他们需要理智和平和。 喜欢是放肆，爱是克制 所以说青春里的很多事情真的是一期一会 也许在某个特定的时候，心底的浪漫情怀还会偶尔释放一下吧…]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>生活</tag>
+        <tag>我的大学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Hexo博客备份移植填坑记]]></title>
+    <url>%2FHexo%E5%8D%9A%E5%AE%A2%E5%A4%87%E4%BB%BD%E7%A7%BB%E6%A4%8D%E5%A1%AB%E5%9D%91%E8%AE%B0.html</url>
+    <content type="text"><![CDATA[我们用Hexo写好了博客，有时候重装系统或者换了台电脑需要更新博客，就存在博客源文件怎么备份和移植的问题。网上有相关的教程，不过有一些纰漏，本文填坑，来自https://www.hsli.top 备份移植思路备份Hexo博客源文件的方法有很多，本文使用Git仓库来备份，诚然，用云盘之类的也可以… 我在Coding上建了个私有仓库存放博客的源代码 以后在新环境中只要从Coding上把整个源文件clone下来就可以了 备份 删除博客根目录和主题目录下的.git文件夹 修改根目录下的.gitignore文件，ignore掉生成的静态博客文件： 12/.deploy_git/public 在博客根目录下执行如下命令，同步源文件到Coding私有仓库 123456git initgit add .git commit -m &quot;First Commit&quot;git remote add origin https://git.coding.net/****.gitgit push -u origin master 移植在新环境中，重新配置环境 安装Git，配置.ssh 密钥 安装Node.js 安装Hexo 用Git Bash选定指定的文件夹，git clone 这样，新环境中的博客源文件就和原来的一致了 填坑指南 上文的教程和网上能查找到的基本一致，但是过程中会出一些错，接下来就是填坑指南了 回车换行符警告1warning: LF will be replaced by CRLF in ... 过程中会出现一大堆这样的警告，覆盖掉了一些关键的错误信息，这是由于Windows和Linux的回车换行符不一致造成的 执行以下指令1git config --global core.autocrlf false commit的时候出现Untracked files 按理说git add .就应该把所有的文件都加进本地仓库的，但是还是会出现这样的错误，这时候只要一个个地把相应的文件和文件夹git add &lt;文件名&gt;添加进去就可以了 添加node_modules文件目录太深1node_modules/****: Filename too long 在Stackoverflow上面找到了答案，这是由于Windows API限制了文件名长度为260字符造成的 执行以下指令1git config --system core.longpaths true 上传的时候RPC failed好了，历经千辛万苦，终于要到最后一步push了，没想到这里还有个坑… 上传的时候出现错误12error: RPC failed; result=56, HTTP code = 200| 5.00 KiB/sfatal: The remote end hung up unexpectedlfy 导致传不上远程库 这是由于博客源文件较大，需要将postBuffer设置大一些 执行以下指令1git config --global http.postBuffer 524288000]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Github</tag>
+        <tag>Coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Hexo+Next主题博客提交百度谷歌收录]]></title>
+    <url>%2FHexo-Next%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%8F%90%E4%BA%A4%E7%99%BE%E5%BA%A6%E8%B0%B7%E6%AD%8C%E6%94%B6%E5%BD%95.html</url>
+    <content type="text"><![CDATA[关于Hexo博客提交搜索引擎收录网上有很多文章，大同小异，但是针对一些具体问题没有写明注意事项，本文针对Hexo+Next主题的提交过程中出现的一些网上少有提及的Bug进行补充，来自https://www.hsli.top 验证网站在百度和谷歌上分别搜索1site:helloshawn.cn 其中的域名换成你的博客域名，如果此前没有进行过操作，应该是搜不到的，并且搜索出来的结果含有搜索引擎提交入口 分别进入搜索引擎提交入口，添加域名，选择验证网站，有3种验证方式，本文推荐采用HTML标签验证 打开Hexo博客站点配置文件，添加以下两行 12google_site_verification: *******baidu-site-verification: ******* 注意 这里的google_site_verification和baidu-site-verification一个是英文下划线一个是减号哦，把后面的**换成搜索引擎提供给你的HTML标签 然后12hexo clean &amp;&amp; hexo generatehexo deploy 然后点击验证，就可以通过验证了 另外提供文件验证方式注意事项下载好文件标签之后，由于主题会修改验证文件，因此需要在验证文件前加上123layout: false---验证文件验证码 添加站点地图先要安装插件Git Bash输入以下命令12npm install hexo-generator-sitemap --savenpm install hexo-generator-baidu-sitemap --save 在博客的站点配置文件_config.yml中添加以下代码12345# 自动生成sitemapsitemap:path: sitemap.xmlbaidusitemap:path: baidusitemap.xml 其实不添加也是可以的 然后编译一下博客1hexo clean &amp;&amp; hexo generate 这时候在博客的public文件夹下面就会出现站点地图sitemap.xml和baidusitemap.xml了 注意 打开两个站点地图文件，会发现里面的网址全是http://yoursite.com/，没有变成我们自己的域名！所以只好Ctrl+F查找替换，把站点地图里面的yoursite.com都换成自己的域名 替换站点地图文件之后不要再generate博客，直接deploy 然后分别在百度和谷歌上提交站点地图就好了 以上注意事项有误，实际上只要在站点配置文件的# URL处填入你的主页地址就可以每次生成的时候自动填好地址了，如下： 12345# URL## If your site is put in a subdirectory, set url as &apos;http://yoursite.com/child&apos; and root as &apos;/child/&apos;# url: http://yoursite.comurl: http://hosea1008.coding.meroot: / 百度自动推送Next主题有百度自动推送功能，不容错过哦 将主题配置文件中的baidu_push设置为true，然后将/next/layout/_scripts文件夹下面的baidu-push.swig文件中的 12&lt;script type=&quot;text/javascript&quot; async src=&quot;//push.zhanzhang.baidu.com/push.js&quot;&gt;&lt;/script&gt; 替换为百度提供的自动推送代码 如下： 1234567891011121314&lt;script&gt;(function()&#123; var bp = document.createElement(&apos;script&apos;); var curProtocol = window.location.protocol.split(&apos;:&apos;)[0]; if (curProtocol === &apos;https&apos;) &#123; bp.src = &apos;https://zz.bdstatic.com/linksubmit/push.js&apos;; &#125; else &#123; bp.src = &apos;http://push.zhanzhang.baidu.com/push.js&apos;; &#125; var s = document.getElementsByTagName(&quot;script&quot;)[0]; s.parentNode.insertBefore(bp, s);&#125;)();&lt;/script&gt; 即可打开自动推送，关于什么是自动推送，百度上面有说哦]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Github</tag>
+        <tag>Coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Hexo博客同时部署在Github和Coding上]]></title>
+    <url>%2FHexo%E5%8D%9A%E5%AE%A2%E5%90%8C%E6%97%B6%E9%83%A8%E7%BD%B2%E5%9C%A8Github%E5%92%8CCoding%E4%B8%8A.html</url>
+    <content type="text"><![CDATA[原来的博客托管在Github上，Github是国外的，速度慢而且不能被百度收录，因此同时部署在Github和Coding上，来自https://www.hsli.top 站点配置文件修改博客根目录下的_config.yml文件下的deploy 官方的格式是：123456deploy: type: git message: [message] repo: github: &lt;repository url&gt;,[branch] gitcafe: &lt;repository url&gt;,[branch] 所以我的格式就是： 1234567# Deployment## Docs: https://hexo.io/docs/deployment.htmldeploy: type: git repository: github: git@github.com:hosea1008/hosea1008.github.io.git,master coding: git@git.coding.net:hosea1008/hosea1008.git,master Coding上新建项目并配置新建项目到Coding上面新建一个项目，项目名称与Coding的用户名一致 Pages方式部署Coding上部署博客有2种方式，Pages方式和演示的方式。演示的方式可是要消耗码币的，因此这里采用Pages方式 如图，打开Pages服务的时候一定要填写master分支，可以帮顶自定义域名 配置公钥添加公钥此前已经在Github上创建了SSH公钥，直接用Github的SSH公钥就可以部署到Coding上了，本地打开C:\Users\用户名\.ssh文件夹，打开id_rsa.pub文件，复制里面的所有内容填写到SSH-RSA公钥内容中，公约名称可以随意起名，添加，输入密码就可以了 测试公钥打开Git Bush输入命令1ssh -T git@git.coding.net 如果返回如下提示，就表示公钥添加成功了 1Coding.net Tips : [Hello ! You&apos;ve conected to Coding.net by SSH successfully! ] 部署Git Bush输入如下命令部署 12hexo clean &amp;&amp; hexo generatehexo deploy 配置域名绑定如果有个人域名，不仅在Pages上面要设置帮顶，还要再个人 域名管理页面添加CNAME记录，如下 我把国外的访问解析到Github上，国内的访问解析到Coding上 至此，部署完成]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Github</tag>
+        <tag>Coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Qt + Qcustomplot绘图插件安装和配置]]></title>
+    <url>%2FQt-Qcustomplot%E7%BB%98%E5%9B%BE%E6%8F%92%E4%BB%B6%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE.html</url>
+    <content type="text"><![CDATA[Qcustomplot是一款小巧精美的Qt绘图工具，可以绘制多种多样的曲线图，折线图，柱形图等等统计图表，可以动态绘图，但是目前版本尚不支持极坐标绘图。本文讲解Qt安装配置Qcustomplot，谨作记录，以备复习。来自https://www.hsli.top 安装可以到 QcustomPlot官网 下载Qcustomplot，打开把qcustomplot.h，qcustomplot.cpp解压出来，用的时候包含到Qt工程的头文件和源文件目录里面 配置使用 在工程文件greaterThan后面添加printsupport，如下 12345678910111213141516171819202122232425262728#-------------------------------------------------## Project created by QtCreator 2016-10-19T23:33:05##-------------------------------------------------QT += core guiQT += serialportgreaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupportTARGET = SerialOscilloscopeTEMPLATE = appSOURCES += main.cpp\ mainwindow.cpp \ qcustomplot.cppHEADERS += mainwindow.h \ qcustomplot.hFORMS += mainwindow.ui#LIBS += -L &quot;E:\Qt\Qt5.5.1\5.5\mingw492_32\lib&quot; -lqwt#INCLUDEPATH += &quot;E:\Qt\Qt5.5.1\5.5\mingw492_32\include\qwt&quot;#include (F:\ISE\Qt\qwt-6.1.3\qwt.prf) 打开界面文件添加一个Widget控件 ，右键选择提升为 提升的类名称填写QCustomPlot（注意，这里是大小写敏感的），然后添加，提升 提升之后建议清理一下项目并且执行一下qmake，笔者遇到过提升之后直接保存运行报错的情况 运行 可以看到，已经出现了坐标系]]></content>
+      <categories>
+        <category>Qt</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>Qcustomplot</tag>
+        <tag>Qt</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Win7下Qt 5 + OpenCV 2.4.13配置]]></title>
+    <url>%2FWin7%E4%B8%8BQt-5-OpenCV-2-4-13%E9%85%8D%E7%BD%AE.html</url>
+    <content type="text"><![CDATA[本文介绍win7 64位下Qt5和OpenCV 2.4.13的联合配置，网上教程众多，各有各的说法，有的对有的错有的漏，本文经过实践验证，作为留存以备重装，真实可用,来自https://www.hsli.top 环境 Win 7 旗舰版 64位 Qt 5.7.0 MSVC 2015 64位 OpenCV 2.4.13 Qt MingW和MSVCQt有两种编译方案，一种是GNU规范的MingW（Minimalist GNU for Windows），相当于在Windows下模拟一个GNU的编译环境，我一开始装的就是这种方案，但是后来发现，在这种方案下要装OpenCV需要把OpenCV用MingW自己编译一遍。。。而OpenCV本身就有用MSVC编译好的预编译的库（不然Visual Studio怎么调用呢是吧？），由于电脑上装有Visual Studio 2015，想把Qt集成到VS2015上，又受到MingW的限制，觉得在Windows上面构建GNU环境有点舍近求远，而且听说在Windows上用MSVC的Qt会比MingW的流畅，何乐而不为呢？果断重新安装Qt。 下载的是Qt 5.7.0 MSVC 2015 64bit的 安装和配置安装Qt安装OpenCV把OpenCV下的build\x64\vc12\bin和build\x86\vc12\bin都加到系统环境变量中。 安装WinDbgQt MSVC的装好之后居然是没有调试器的，没有调试器的。。。百度一下WinDbg，去微软官网上下一个，微软官网上面的是在线安装器，在WDK的下载页面那里，上面的英文说的很清楚了，如果只要WinDbg的话，在安装的时候把别的都取消勾选就好了 终于安装好了，Qt下新建一个工程，慢慢来吧，先来个控制台的 配置Qt和OpenCV这一步就很坑了 在新工程的.pro文件里面添加OpenCV的目录和库，我的添加的是下面这样的：123456789101112131415161718192021222324252627282930313233343536373839404142434445464748INCLUDEPATH += D:\OpenCV2413\opencv\build\include \INCLUDEPATH += D:\OpenCV2413\opencv\build\include\opencv \INCLUDEPATH += D:\OpenCV2413\opencv\build\include\opencv2win32:CONFIG(debug,debug|release):&#123;LIBS += -LE:\Qt_MSVC\build\x64\vc12\lib\-lopencv_calib3d2413d \-lopencv_contrib2413d \-lopencv_core2413d \-lopencv_features2d2413d \-lopencv_flann2413d \-lopencv_gpu2413d \-lopencv_highgui2413d \-lopencv_imgproc2413d \-lopencv_legacy2413d \-lopencv_ml2413d \-lopencv_nonfree2413d \-lopencv_objdetect2413d \-lopencv_ocl2413d \-lopencv_photo2413d \-lopencv_stitching2413d \-lopencv_superres2413d \-lopencv_ts2413d \-lopencv_video2413d \-lopencv_videostab2413d&#125;else:win32:CONFIG(release,debug|release):&#123;#LIBS += -LE:\Qt_MSVC\build\x64\vc12\lib\LIBS += -LD:\OpenCV2413\opencv\build\x64\vc12\lib\-lopencv_calib3d2413 \-lopencv_contrib2413 \-lopencv_core2413 \-lopencv_features2d2413 \-lopencv_flann2413 \-lopencv_gpu2413 \-lopencv_highgui2413 \-lopencv_imgproc2413 \-lopencv_legacy2413 \-lopencv_ml2413 \-lopencv_nonfree2413 \-lopencv_objdetect2413 \-lopencv_ocl2413 \-lopencv_photo2413 \-lopencv_stitching2413 \-lopencv_superres2413 \-lopencv_ts2413 \-lopencv_video2413 \-lopencv_videostab2413&#125; 把OpenCV目录换成你的OpenCV相应目录就行了，网上有人说目录太深的话会导致错误，其实不会的 注意事项（坑之所在）修改.pro文件之后，一定要在Qt点一遍构建-执行qmake，不然编译的时候还是按原来的配置 加载了OpenCV之后，似乎只能用Release模式来运行，Debug模式下程序总是闪退。。。不知何故 MSVC版本的Qt虽然编译和运行比MingW的快，但是，调试的时候，点了调试键之后，不要怀疑程序卡死了，等很久，才打开调试器。。。 无力吐槽]]></content>
+      <categories>
+        <category>Qt</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>OpenCV</tag>
+        <tag>Qt</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Matlab离线训练好的神经网络在Visual Studio中调用]]></title>
+    <url>%2FMatlab%E7%A6%BB%E7%BA%BF%E8%AE%AD%E7%BB%83%E5%A5%BD%E7%9A%84%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9C%A8Visual-Studio%E4%B8%AD%E8%B0%83%E7%94%A8.html</url>
+    <content type="text"><![CDATA[本文将Matlab训练好的神经网络参数导出，在Visual Studio中导入，对数据重新计算。本文的方法可以用于C++调用离线训练好的神经网络。作为神经网络学习之路的一个小小记录，来自https://www.hsli.top Matlab训练神经网络首先在Matlab中训练神经网络，本文使用了Matlab的神经网络工具箱中的House Pricing示例模型。 在Matlab命令行界面中键入nnstart进入神经网络工具箱，导入数据，默认隐含层有10个神经元，一路next到这里，导出矩阵参数的神经网络匹配函数 得到myNeuralNetworkFunction函数，例如下面这个： 可见里面有很多的数据矩阵，那些就是神经网络的权值和偏置参数 写一小段代码，用于测试生成的神经网络，例如： 12345i=1:15;predict = myNeuralNetworkFunction(houseInputs(:,i))result = houseTargets(i);plot(predict,'b');hold on;plot(result,'g'); 该代码用了生成的神经网络重新计算前15组输入数据，并与真实结果plot在同一幅图像中，可见该神经网络还是比较令人满意的 导出Matlab的神经网络参数上文生成的神经网络函数中包含了很多的网络权值和偏移参数，下面将这些参数矩阵导出供Visual Studio读取 在myNeuralNetworkFunction退出的地方放置一个断点，让程序跑到这里停止，方便导出数据 将结构体中的矩阵分别复制出来 123x1_xoffset = x1_step1.xoffsetx1_gain = x1_step1.gain%...方法类似，在此不赘述 将矩阵保存到文件中 123save('x1_gain.txt','x1_gain','-ascii')save('x1_xoffset.txt','x1_xoffset','-ascii')%...方法类似，不赘述 注意保存的时候要使用-ascii参数 可见，Matlab的工作目录中生成了一系列的文件，里面就是响应的矩阵数据，将他们复制到Visual Studio工程目录中 此处我新建了一个data文件夹以免混乱 Visual Studio工程中调用参数参考本博客文章Visual Studio使用Armadillo线性代数运算库添加Armadillo线性代数库，新建工程，编写代码 注意：貌似LAPACK和BLAS库有点问题，因此到Armadillo的config.hpp中注释掉12#define ARMA_USE_LAPACK#define ARMA_USE_BLAS 这两句，调试阶段，牺牲一点速度吧 代码中矩阵的初始化使用load方法读取文件，如下： 12layer1.bias.load("data\\b1.txt", raw_ascii);layer1.weight.load("data\\IW1_1.txt", raw_ascii); 测试代码OffLineNeuralNet.hpp 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263#pragma once#ifndef _OFFLINE_NEURAL_#define _OFFLINE_NEURAL_#include "stdafx.h"#include &lt;armadillo&gt;using namespace arma;using namespace std;enum Method method;class Setting&#123;public: mat xoffset; mat gain; mat ymin;&#125;;class Layer&#123;public: mat bias; mat weight;&#125;;mat mapminmax_apply(mat x, Setting setting)&#123; mat y; mat temp = x; y = x - setting.xoffset; y = y % setting.gain; temp.fill(setting.ymin(0, 0)); y = y + temp; return y;&#125;mat tansig_apply(mat n)&#123; mat a; a = 2 / (1 + exp(-2 * n)) - 1; return a;&#125;mat mapminmax_reverse(mat y, Setting setting)&#123; mat x; mat temp = y; temp.fill(setting.ymin(0, 0)); x = y - temp; temp.fill(setting.gain(0, 0)); x = x / temp; temp.fill(setting.xoffset(0, 0)); x = x + setting.xoffset; return x;&#125;#endif // !_OFFLINE_NEURAL_ main.cpp 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061// HousePrizeModel.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;armadillo&gt;#include "OffLineNeuralNet.h"#define TOTAL_TEST 15using namespace arma;const mat x1_ymin = &#123; -1 &#125;;const mat y1_ymin = &#123; -1 &#125;;const mat y1_gain = &#123; 0.0444444444444444 &#125;;const mat y1_xoffset = &#123; 5 &#125;;const mat layer2_b = &#123; 0.91848175916311114 &#125;;int main()&#123; Setting x1_step1, y1_step1; Layer layer1, layer2; x1_step1.xoffset.load("data\\x1_xoffset.txt", raw_ascii); x1_step1.gain.load("data\\x1_gain.txt", raw_ascii); x1_step1.ymin = x1_ymin; y1_step1.ymin = y1_ymin; y1_step1.gain = y1_gain; y1_step1.xoffset = y1_xoffset; layer1.bias.load("data\\b1.txt", raw_ascii); layer1.weight.load("data\\IW1_1.txt", raw_ascii); layer2.bias = layer2_b; layer2.weight.load("data\\LW2_1.txt", raw_ascii); mat houseInputs; vec result(TOTAL_TEST); houseInputs.load("data\\houseInputs.txt", raw_ascii); for (int i = 0; i &lt; TOTAL_TEST; i++) &#123; mat x1 = houseInputs.col(i); mat xp1 = mapminmax_apply(x1, x1_step1); mat a1 = tansig_apply(layer1.bias + layer1.weight * xp1); mat a2 = layer2.bias + layer2.weight*a1; double result_temp = mapminmax_reverse(a2, y1_step1)(0); result.at(i) = result_temp; &#125; result.print("Target = "); system("pause"); return 0;&#125; 同样测试了数据集的前15组数据，结果如下：]]></content>
+      <categories>
+        <category>机器学习</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>Machine Learning</tag>
+        <tag>Armadillo</tag>
+        <tag>Visual Studio</tag>
+        <tag>机器学习</tag>
+        <tag>神经网络</tag>
+        <tag>Nerual Network</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Visual Studio使用Armadillo线性代数运算库]]></title>
+    <url>%2FVisual-Studio%E4%BD%BF%E7%94%A8Armadillo%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E8%BF%90%E7%AE%97%E5%BA%93.html</url>
+    <content type="text"><![CDATA[在Visual Studio中可以添加Armadillo线性代数库，进行一些矩阵运算，本文在Visual Studio 2015中添加Armadillo进行一系列测试，其中有几个调试要点,来自https://www.hsli.top 下载Armadillo到 Armadillo官网 下载该库，放在自定义的目录，比如F:\ISE\Machine Learning 下载支持库到 这里 下载几个库文件,放在自定义目录比如F:\ISE\Machine Learning\armadillo-7.400.4，如下：123456blas.libblasd.liblapack.liblapackd.liblibf2c.liblibf2cd.lib Visual Studio连接 可参考本博客文章Win7+OpenCV 2.4.13+Visual Studio 2015一劳永逸的配置 在Visual Studio中新建控制台工程，在属性管理器中的Debug|Win32选项下右键添加新的项目属性表，取名Armadillo_Debug 修改 包含目录，添加Armadillo的include目录所在路径，比如F:\ISE\Machine Learning\armadillo-7.400.4\include 修改库目录，添加下载的支持库所在的目录，比如F:\ISE\Machine Learning\armadillo-7.400.4 修改连接器-&gt;输入-&gt;附加依赖项，添加 123blasd.liblapackd.liblibf2cd.lib 同理，在Release|Win32选项下右键添加新的项目属性表，取名Armadillo_Release，同上添加包含目录和库目录，在附加依赖项中添加如下： 123blas.liblapack.liblibf2c.lib 打开Armadillo的C++11支持 该设置由本人摸索出来，用于解决Armadillo对矩阵直接赋值初始化报错的问题 打开\include\armadillo_bits目录中的config.hpp 找到#define ARMA_USE_CXX11取消注释即可 测试在源文件中输入以下代码测试： 123456789101112131415161718192021222324252627// HousePrizeModel.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;armadillo&gt;using namespace arma;const mat b1 = &#123; &#123;1, 3, 5&#125;, &#123;2, 4, 6&#125; &#125;;const mat b2 = &#123; &#123;3,4,5&#125;, &#123;4,5,6&#125; &#125;;int main()&#123; b1.print("b1:"); b2.print("b2:"); mat c = b1%b2; c.print("b1 .* b2 = "); system("pause"); return 0;&#125;]]></content>
+      <categories>
+        <category>机器学习</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>Machine Learning</tag>
+        <tag>Armadillo</tag>
+        <tag>Visual Studio</tag>
+        <tag>机器学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Win7+OpenCV 2.4.13+Visual Studio 2015一劳永逸的配置]]></title>
+    <url>%2FWin7-OpenCV-2-4-13-Visual-Studio-2015%E4%B8%80%E5%8A%B3%E6%B0%B8%E9%80%B8%E7%9A%84%E9%85%8D%E7%BD%AE.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 本文提供一种一劳永逸配置OpenCV的方法，基于Win7+OpenCV 2.4.13+Visual Studio 2015 本文所涉及的所有D:\OpenCV2413\为笔者的OpenCV安装目录，请修改为你自己的安装目录 首先从官网下载OpenCV2.4.13安装包，解压安装到自定义目录 环境变量修改环境变量，系统属性-&gt;高级系统设置-&gt;高级-&gt;环境变量中系统变量Path添加一条指向OpenCV目录内的D:\OpenCV2413\opencv\build\x86\vc12\bin文件夹 设置属性新建一个Visual Studio控制台工程，导航到视图-&gt;其他窗口-&gt;属性管理器，右键点击Debug | Win32 添加新项目属性表，命名为OpenCV_2.4.13_Debug_x86.props保存到自定目录，本文以G:\Visual Studio\OpenCV为例，并修改以下项目： 包含目录在通用属性-&gt;VC++目录-&gt;包含目录中，添加123D:\OpenCV2413\opencv\build\includeD:\OpenCV2413\opencv\build\include\opencv2D:\OpenCV2413\opencv\build\include\opencv 注意请导航到你自己的OpenCV安装目录下 库目录在通用属性-&gt;VC++目录-&gt;库目录中，添加1D:\OpenCV2413\opencv\build\x86\vc12\lib 如下图 添加附加依赖项在属性页打开通用属性-&gt;链接器-&gt;输入-&gt;附加依赖项 到D:\OpenCV2413\opencv\build\x86\vc12\lib目录中新建一个list.bat批处理文件，输入以下内容：1234cd %dir *d.lib &gt;&gt; debug.listdir *3.lib &gt;&gt; release.listpause 保存关闭，运行，在目录下即可得到debug.list和release.list文件，用记事本打开如下： debug.list 1234567891011121314151617181920212223242526 驱动器 D 中的卷是 Software 卷的序列号是 E48E-92B4 D:\OpenCV2413\opencv\build\x86\vc12\lib 的目录2016/05/12 19:44 210,502 opencv_calib3d2413d.lib2016/05/12 19:45 373,270 opencv_contrib2413d.lib2016/05/12 19:43 473,664 opencv_core2413d.lib2016/05/12 19:44 332,938 opencv_features2d2413d.lib2016/05/12 19:43 107,910 opencv_flann2413d.lib2016/05/12 19:44 457,990 opencv_gpu2413d.lib2016/05/12 19:43 142,812 opencv_highgui2413d.lib2016/05/12 19:43 193,196 opencv_imgproc2413d.lib2016/05/12 19:44 476,570 opencv_legacy2413d.lib2016/05/12 19:43 240,664 opencv_ml2413d.lib2016/05/12 19:44 307,260 opencv_nonfree2413d.lib2016/05/12 19:44 185,948 opencv_objdetect2413d.lib2016/05/12 19:44 557,966 opencv_ocl2413d.lib2016/05/12 19:43 91,576 opencv_photo2413d.lib2016/05/12 19:45 568,938 opencv_stitching2413d.lib2016/05/12 19:44 371,396 opencv_superres2413d.lib2016/05/12 19:44 9,614,610 opencv_ts2413d.lib2016/05/12 19:43 115,816 opencv_video2413d.lib2016/05/12 19:44 381,590 opencv_videostab2413d.lib 19 个文件 15,204,616 字节 0 个目录 26,290,794,496 可用字节 将其中的库文件名复制出来，如下：12345678910111213141516171819opencv_calib3d2413d.libopencv_contrib2413d.libopencv_core2413d.libopencv_features2d2413d.libopencv_flann2413d.libopencv_gpu2413d.libopencv_highgui2413d.libopencv_imgproc2413d.libopencv_legacy2413d.libopencv_ml2413d.libopencv_nonfree2413d.libopencv_objdetect2413d.libopencv_ocl2413d.libopencv_photo2413d.libopencv_stitching2413d.libopencv_superres2413d.libopencv_ts2413d.libopencv_video2413d.libopencv_videostab2413d.lib 粘贴到附加依赖项中 确定保存，至此，Debug的属性配置完毕，不要忘记右键该属性表保存 Release属性表接下来配置Release属性表 创建Release属性表在Debug属性表保存的G:\Visual Studio\OpenCV目录中，将OpenCV_2.4.13_Debug_x86.props属性表复制一份，命名为OpenCV_2.4.13_Release_x86.props 修改Release属性在Visual Studio工程中的属性管理器窗口右键点击Release | Win32添加现有属性表，导航到G:\Visual Studio\OpenCV目录添加Release属性表OpenCV_2.4.13_Release_x86.props，并双击打开修改通用属性-&gt;链接器-&gt;输入-&gt;附加依赖项 打开上文中生成的release.list，复制出release库的文件名，如下： release库：12345678910111213141516171819opencv_calib3d2413.libopencv_contrib2413.libopencv_core2413.libopencv_features2d2413.libopencv_flann2413.libopencv_gpu2413.libopencv_highgui2413.libopencv_imgproc2413.libopencv_legacy2413.libopencv_ml2413.libopencv_nonfree2413.libopencv_objdetect2413.libopencv_ocl2413.libopencv_photo2413.libopencv_stitching2413.libopencv_superres2413.libopencv_ts2413.libopencv_video2413.libopencv_videostab2413.lib 粘贴到附加依赖项中，确定保存，右键单击该属性表保存属性表。 添加msvc120d在VS2015中编译OpenCV 2.4.13程序会报错MSVCR120D.dll和MSVC120P.dll缺失 点击这里下载链接下载msvc120d两个文件，放在D:\OpenCV2413\opencv\build\x86\vc12\bin目录中，再次编译即可解决问题。 注意切换到你自己的OpenCV安装目录下 测试在工程中输入以下代码，测试运行 1234567891011121314151617181920212223242526272829303132333435363738// Test.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;iostream&gt;#include &lt;opencv2\core\core.hpp&gt;#include &lt;opencv2\highgui\highgui.hpp&gt;using namespace std;using namespace cv;int main()&#123; VideoCapture cap(0); if (!cap.isOpened()) &#123; cout &lt;&lt; "Camera Error!" &lt;&lt; endl; return -1; &#125; Mat frame; namedWindow("Image", CV_WINDOW_AUTOSIZE); while (1) &#123; cap &gt;&gt; frame; imshow("Image", frame); if (waitKey(2) == 27) &#123; destroyAllWindows(); break; &#125; &#125; return 0;&#125; 该程序会打开摄像头显示摄像头图像，至此完全配置完毕 新项目使用OpenCV新项目要使用OpenCV时，只需要在Debug | Win32中添加保存好的Debug属性表即可，要生成Release版本的话在Release | Win32中添加保存好的Release属性表，非常方便。]]></content>
+      <categories>
+        <category>图像识别</category>
+      </categories>
+      <tags>
+        <tag>OpenCV</tag>
+        <tag>Visual Studio</tag>
+        <tag>Win7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu 12.04 VPS 搭建LNMP环境]]></title>
+    <url>%2FUbuntu-12-04-VPS-%E6%90%AD%E5%BB%BALNMP%E7%8E%AF%E5%A2%83.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 本文从全新的Ubuntu 12.04 VPS下搭建LNMP环境 准备首先，手头的服务器是腾讯云的服务器，这里有个坑，必须在腾讯云管理面板中设置安全组开放端口，才能从外网访问服务器 更新一下系统12sudo apt-get updatesudo apt-get upgrade 安装Nginx和PHP安装配置Nginx安装nginx 1sudo apt-get install nginx 启动nginx 1sudo service nginx start 测试nginx 1wget http://127.0.0.1 如果出现如下结果，则nginx部署成功 在浏览器中，访问服务器公网IP查看Nginx是否运行 安装配置PHP安装PHP 1sudo apt-get install php5-fpm 配置php启动方式 在/etc/php5/fpm/pool.d/www.conf 里配置启动方式，配置如下： 12listen = /var/run/php5-fpm.socklisten = 127.0.0.1:9000 启动php 1sudo service php5-fpm start 联合配置Nginx和PHP修改php5-fpm和Nginx的配置，实现联动 用以下命令查看php-fpm默认配置 1sudo netstat -tunpl | grep php-fpm 如下： 因此需要把php解析的请求转发到127.0.0.1:9000 修改Nginx配置 1sudo vim /etc/nginx/sites-available/default 修改配置文件相应部分如下 1234567891011121314# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000#location ~ \.php$ &#123;# fastcgi_split_path_info ^(.+\.php)(/.+)$;# # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini## # With php5-cgi alone: fastcgi_pass 127.0.0.1:9000;# # With php5-fpm:# fastcgi_pass unix:/var/run/php5-fpm.sock; fastcgi_index index.php; include fastcgi_params;&#125; 修改完成，按下Esc 键，输入 :wq! 保存退出 重启服务12sudo service nginx restartsudo service php5-fpm restart 验证创建测试php文件 12sudo vim /usr/share/nginx/html/info.phpsudo vim /usr/share/nginx/html/hello.php info.php 中写入以下内容： 123&lt;?php phpinfo();?&gt; hello.php 中写入如下内容 1234&lt;?php echo "&lt;title&gt;Test Page&lt;/title&gt;"; echo "Hello World!";?&gt; 保存退出，在浏览器中访问公网IP/info.php 访问公网IP/hello.php]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+        <tag>VPS</tag>
+        <tag>LNMP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[C/C++进阶学习笔记（三） 异常处理 try catch throw]]></title>
+    <url>%2FC-C-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86-try-catch-throw.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 本节介绍C++里面的异常处理 throwthrow可以理解为人为地抛出自定义的异常类型，可以用于代码中符合某些条件时刻意地制造一些异常信息抛出给控制台处理，比如如下例子： 1234Sales_item item1,item2;if(!item1.same_isbn(item2)) //当item1和item2的ISBN不同时，抛出异常 throw runtime_error("Data must refer to same ISBN");cout &lt;&lt; item1 + item2 &lt;&lt; endl; try catch结构try catch结构用于捕捉程序中会出现的异常，并对异常进行处理 try一下某句代码会不会有异常，如果有的话catch某种类型的异常，并进行处理 123456789try&#123; 可能出现异常的语句;&#125;catch(异常种类1 异常变量名1)&#123; 处理第一种异常的语句;&#125;catch(异常种类2 异常变量名2)&#123; 处理第二种异常的语句;&#125; 常见的异常种类 异常名 解释 exception 最常见的问题 runtime_error 运行时的错误，只有在运行时才能检测到 range_error 运行时的错误，生成的结果超出了可接受的值域 overflow_error 运行时的错误，计算上溢 underflow_error 运行时的错误，计算下溢 logic_error 逻辑错误，可在运行前检测到 domain_error 逻辑错误，参数的结果值不存在 invalid_argument 逻辑错误，不合适的参数 length_error 逻辑错误，试图生成一个超出该类型最大长度的对象 out_of_range 逻辑错误，使用一个超出有效范围的值 实例123456789101112131415161718192021222324252627282930313233343536373839404142434445// try_catch_throw.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;iostream&gt;#include &lt;bitset&gt;using namespace std;int main()&#123; bitset&lt;100&gt; bs; //定义bitset，可以理解为位数组 for (size_t index = 0; index != bs.size(); ++index) //用size_t访问数组位，可以动态地自我改变index的类型，避免访问不到数组的高位元素 bs[index] = index; //bs.to_ulong(); try &#123; bs.to_ulong(); //bs的长度（100）大于ulong能存储的位数，此处会出现溢出异常 &#125; catch (runtime_error err) //catch runtime error &#123; cout &lt;&lt; err.what() &lt;&lt; endl; &#125; try &#123; //throw logic_error("just kidding"); throw overflow_error("just kidding"); //这里人为地抛出异常供后面的语句来catch &#125; catch (overflow_error err) &#123; cout &lt;&lt; "overflow error" &lt;&lt; endl &lt;&lt; err.what() &lt;&lt; endl; &#125; catch (logic_error err) &#123; cout &lt;&lt; "logic error" &lt;&lt; endl &lt;&lt; err.what() &lt;&lt; endl; &#125; system("pause"); return 0;&#125;]]></content>
+      <categories>
+        <category>编程语言</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>C++</tag>
+        <tag>编程语言</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[C/C++进阶学习笔记（二） 容器vector]]></title>
+    <url>%2FC-C-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89-%E5%AE%B9%E5%99%A8vector.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top vector可以理解为存放各种相同对象的容器，相当于一个可变长的数组，元素可以是各种对象 容器Vector创建Vector 包含头文件#include &lt;vector&gt; 定义和初始化 1234vector&lt;int&gt; ivec1; //定义int容器vector&lt;int&gt; ivec2(ivec1); //复制ivec1的内容到ivec2vector&lt;int&gt; ivec3(10,-1); //10个元素，都初始化为-1vector&lt;string&gt; svec(10,"Hi!"); //10个string，初始化为“Hi！” 操作Vector1234567891011v.empty(); //如果v为空，返回truev.size(); //返回v的元素个数v.push_back(t); //添加值为t的元素到v中v[n]; //返回位置n的元素v1 = v2; //赋值v1 == v2; //比较，相等返回true!=,&lt;,&lt;=,&gt;,&gt;= //保留原有的意义v.insert(vec.begin()+i,a); //在v中第i+1个元素前面插入a;v.erase(vec.begin()+2); //删除v中第3个元素v.erase(vec.begin()+i,vec.end()+j); //删除v区间[i,j-1]的元素v.clear(); //清空v 迭代器 Iterators 迭代器表示容器中的“位置”，可以理解为指向容器中元素的游标，使得编写与容器类型无关的泛型算法成为可能 迭代器访问vector12for (vector&lt;string&gt;::iterator it = str_vec.begin(); it != str_vec.end(); it++) //迭代器访问vector cout &lt;&lt; *it &lt;&lt; endl; 在string中，size_type的作用有点像这里的迭代器，可以用于访问string中的特定元素，如下：1234string str("Hello world!");for(string::size_type ix = 0; ix != str.size(); ++ix) str[ix] = '*';&gt; 实例12345678910111213141516171819202122232425262728293031323334353637// vector.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;algorithm&gt;#include &lt;vector&gt;#include &lt;iostream&gt;#include &lt;string&gt;using namespace std;int main()&#123; int i = 5; string line; vector&lt;string&gt; str_vec; while (i--) &#123; getline(cin, line); str_vec.push_back(line); &#125; //录入vector各个元素 sort(str_vec.begin(),str_vec.end()); //排序，默认从小到大，包含于头文件#include &lt;algorithm&gt; cout &lt;&lt; endl &lt;&lt; "sorted elements:" &lt;&lt; endl; for (vector&lt;string&gt;::iterator it = str_vec.begin(); it != str_vec.end(); it++) //迭代器访问vector cout &lt;&lt; *it &lt;&lt; endl; cout &lt;&lt; "which element do you want to check:"; cin &gt;&gt; i; line = str_vec[i]; //下标访问vector cout &lt;&lt; "Length:" &lt;&lt; line.length() &lt;&lt; endl; return 0;&#125;]]></content>
+      <categories>
+        <category>编程语言</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>C++</tag>
+        <tag>编程语言</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[C/C++进阶学习笔记（一） 枚举类型]]></title>
+    <url>%2FC-C-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89-%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 为了在C/C++的学习之路中留下更深刻的印象，从现在开始，我将着手写一系列的C/C++进阶学习笔记，文章中不涉及深层次的应用，不作教科书式的详解，只写出基本的用法和介绍，以后在学习和工作过程中有用到的功能再作补充，保证介绍的简洁、实用和高效 枚举类型介绍有时候在开发中需要定义一系列的有规律的常量1234567#define Mon 1#define Tue 2#define Wed 3#define Thu 4#define Fri 5#define Sat 6#define Sun 7 这样的写法比较重复累赘，我们可以用枚举类型简化这一过程 1234enum DAY&#123; Mon = 1, Tue, Wed, Thu, Fri, Sat, Sun&#125;; 与上述的反复#define等价，都定义了一系列的常量变量，这就是枚举类型的主要作用，默认第一个常量从0开始，可以人为赋值每一个常量的值 用法 声明和定义分开 123456789enum DAY&#123; Mon = 1,Tue,Wed,Thu,Fri,Sat,Sun&#125;;......enum DAY yesterday;enum DAY today; 声明和定义同时进行 12345678910enum //标号DAY可以省略 &#123; Sat, Sun = 0, Mon, Tue, Wed, Thu, Fri &#125; today; //today的类型为枚举型enum DAY 1enum DAY &#123; Mon=1, Tue, Wed, Thu, Fri Sat, Sun&#125; today; //声明同时定义 示例 环境 Windows 7 旗舰版 Visual Studio 2015 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374// Enum_Practice.cpp : 定义控制台应用程序的入口点。//#include "stdafx.h"#include &lt;iostream&gt;using namespace std;enum Week&#123; Sun = 1, Mon, Tue, Wed, Thu, Fri, Sat&#125;;int main()&#123; enum Week today, yesterday; int temp; while (1) &#123; cout &lt;&lt; endl &lt;&lt; "Enter day: " &lt;&lt; endl; cin &gt;&gt; temp; today = (Week)temp; //赋值要强制转换类型 switch (today) &#123; case Sun:cout &lt;&lt; "Sunday" &lt;&lt; endl; break; case Mon:cout &lt;&lt; "Monday" &lt;&lt; endl; break; case Tue:cout &lt;&lt; "Tuesday" &lt;&lt; endl; break; case Wed:cout &lt;&lt; "Wendsday" &lt;&lt; endl; break; case Thu:cout &lt;&lt; "Thursday" &lt;&lt; endl; break; case Fri:cout &lt;&lt; "Friday" &lt;&lt; endl; break; case Sat:cout &lt;&lt; "Sataday" &lt;&lt; endl; break; default:cout &lt;&lt; "Error" &lt;&lt; endl; break; &#125;; yesterday = (Week)(today - 1); //赋值要进行类型强制转换 cout &lt;&lt; "Yesterday is "; switch (yesterday) &#123; case Sun:cout &lt;&lt; "Sunday" &lt;&lt; endl; break; case Mon:cout &lt;&lt; "Monday" &lt;&lt; endl; break; case Tue:cout &lt;&lt; "Tuesday" &lt;&lt; endl; break; case Wed:cout &lt;&lt; "Wendsday" &lt;&lt; endl; break; case Thu:cout &lt;&lt; "Thursday" &lt;&lt; endl; break; case Fri:cout &lt;&lt; "Friday" &lt;&lt; endl; break; case Sat:cout &lt;&lt; "Sataday" &lt;&lt; endl; break; default:cout &lt;&lt; "Error" &lt;&lt; endl; break; &#125;; &#125; return 0;&#125;]]></content>
+      <categories>
+        <category>编程语言</category>
+      </categories>
+      <tags>
+        <tag>C/C++</tag>
+        <tag>C++</tag>
+        <tag>编程语言</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[2014远征-记录]]></title>
+    <url>%2F2014%E8%BF%9C%E5%BE%81-%E8%A7%86%E9%A2%91.html</url>
+    <content type="text"><![CDATA[骑迹 2014 队员28人 队长: 杨文亮（1号） 协理: 於丙然 (12号)、胡宗海 (9号) 女生11人: 李芳宇(5号)、杨君婷(24号)、董云霞(8号)、卢亚蒙(10号)、薛心仪(23号)、文晓欢(26号)、尹玉如(3号)、刘慧莹(14号)、张明玮(19号)、周思怡(16号)、李金彦(15号) 男生17人: 王凯栋(7号)、马浩然(21号)、秦照岭(4号)、赵虔（22号）、花罗俊(20号)、李宠(13号)、黄灏(2号)、宁圣林(11号)、郭昊一(25号)、石宽(17号)、赖迪南(6号)、康航(27号)、李洪珊(18号)、邵宇杰(27.5号) 实际路线 总行程：2566km 总时间：33天 骑行时间：23天 途径省份：四川-陕西-甘肃-青海 每日行程： 日期 行程 骑行里程 7.7—7.9 火车 济南——成都 7.9—7.10 成都出发前准备 7.11 成都—广汉—德阳 70km 7.12 德阳—绵阳—梓潼县 119km 7.13 梓潼县—柳沟镇—剑阁县 126km 7.14 剑阁县—广元—陕西宁强 122.5km 7.15 宁强—勉县—汉中 119km 7.16 汉中休整 7.17 汉中——佛坪县 146km 7.18 佛坪县——周至县 124km 7.19 周至县——西安 92km 7.20 西安休整 7.21 西安—周至—眉县 126km 7.22 眉县—宝鸡—甘肃东岔镇 124km 7.23 东岔镇—元龙镇—天水 124km 7.24 天水—甘谷镇—文峰镇 155km 7.25 文峰镇休整 7.26 文峰镇—殪虎桥乡—岷县 128km 7.27 岷县—卓尼—临潭县 97km 7.28 临潭县—合作市—夏河县 138km 7.29 夏河县——同仁县 110km 到达海拔最高处：贡乃拉合垭口 海拔3643.66km 7.30 同仁县休整 7.31—8.1 同仁县社会实践 8.2 同仁县—尖扎县—扎巴镇 103km 8.3 扎巴—群加乡—尕让乡 84km 远征最艰苦一天 8.4 尕让乡骑行至贵德镇后乘车至倒倘河，半天休整 32km 8.5 倒倘河——黑马河乡 118km 8.6 黑马河乡——刚察 118.5km 8.7 刚察——海晏 100km 8.8 海晏——西宁 90km 远征视频]]></content>
+      <categories>
+        <category>骑迹</category>
+      </categories>
+      <tags>
+        <tag>骑行</tag>
+        <tag>远征</tag>
+        <tag>骑迹</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu VPS开启root账户SSH登录]]></title>
+    <url>%2FUbuntu-VPS%E5%BC%80%E5%90%AFroot%E8%B4%A6%E6%88%B7SSH%E7%99%BB%E5%BD%95.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 有时候我们需要在VPS上开启root账户的SSH登录服务，按照如下步骤可以开启 设置root账户密码如果root账户尚未设置密码，则需要如下步骤为root账户设置密码 1sudo passwd root 修改sshd_config以其他账户登录，修改/etc/ssh/sshd_config: 1sudo vim /etc/ssh/sshd_config vi命令的快速入门快速入门vi命令有个巧方法，在ubuntu下输入 vimtutor 即可打开一个自带的学习工具，跟着教程来，可以快速入门vi命令 注释掉PermitRootLogin without-password行，root用户可以从无密钥的计算机登录 添加PermitRootLogin yes允许root用户登录 重启ssh服务1sudo service ssh restart]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>VPS</tag>
+        <tag>root</tag>
+        <tag>SSH</tag>
+        <tag>vim</tag>
+        <tag>vimtutor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu14下OpenCV3和QT5的安装及联合使用]]></title>
+    <url>%2FUbuntu14%E4%B8%8BOpenCV3%E5%92%8CQT5%E7%9A%84%E5%AE%89%E8%A3%85%E5%8F%8A%E8%81%94%E5%90%88%E4%BD%BF%E7%94%A8.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 本文参考了众多安装教程综合而成，力求做出一个最有效最快捷的安装方案： Ubuntu 14.04 OpenCV 3.0 QT 5 安装一些基本的支持包123sudo apt-get install build-essentialsudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-devsudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev 下载OpenCV 可以从OpenCV官网下载opencv安装包[ OpenCV官网] 安装OpenCV解压到自定义目录，进入然后创建build目录并进入 12mkdir buildcd build 配置opencv 1cmake -D CMAKE_BUILD_TYPE=Release -D MAKE_INSTALL_PREFIX=/usr/local .. 这里安装在/usr/local目录 进行编译 1make 漫长的等待之后安装opencv库 1sudo make install 至此opencv3就安装完了，到/usr/local/include下可以看到opencv的头文件，到/usr/local/lib下可以看到opencv的库文件 安装QT1sudo apt-get install qt-sdk 这里一句命令搞定了qt的所有安装，简便快捷 QT与OpenCV的联合使用由于先要测试一下qt与opencv的联合，因此首先打开qt-creater创建一个console application 在此我测试了一遍加载haar分类器进行人脸识别的代码 注意头文件一定要include全，用qt写代码有代码提示和高亮，相当舒服 然后修改工程文件，双击打开工程名.pro在最后加上以下代码 1234567891011121314151617181920INCLUDEPATH += /usr/local/include \/usr/local/include/opencv \/usr/local/include/opencv2LIBS += /usr/local/lib/libopencv_calib3d.so \/usr/local/lib/libopencv_core.so \/usr/local/lib/libopencv_features2d.so \/usr/local/lib/libopencv_flann.so \/usr/local/lib/libopencv_highgui.so \/usr/local/lib/libopencv_imgcodecs.so \/usr/local/lib/libopencv_imgproc.so \/usr/local/lib/libopencv_ml.so \/usr/local/lib/libopencv_objdetect.so \/usr/local/lib/libopencv_photo.so \/usr/local/lib/libopencv_shape.so \/usr/local/lib/libopencv_stitching.so \/usr/local/lib/libopencv_superres.so \/usr/local/lib/libopencv_videoio.so \/usr/local/lib/libopencv_video.so \/usr/local/lib/libopencv_videostab.so 实际上加载的库只需要本程序必须的库就可以，但是为了方便期间，我把所有的库都写在一个txt里，以后每次修改就粘贴进去 列出所有库的方法： 1ls /usr/local/lib &gt;&gt; list.txt 需要权限然后用gedit把路径/usr/local/lib等替换进去 编译工程，运行，大搞成功]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>OpenCV</tag>
+        <tag>Qt</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SSD+HDD 固态机械双硬盘 Ubuntu Win7 双系统]]></title>
+    <url>%2FSSD-HDD-%E5%9B%BA%E6%80%81%E6%9C%BA%E6%A2%B0%E5%8F%8C%E7%A1%AC%E7%9B%98-Ubuntu-Win7-%E5%8F%8C%E7%B3%BB%E7%BB%9F.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 电脑为宏碁E5-472，买回来本着折腾到底的态度，卸掉了光驱到某宝上淘得一个所谓光驱位硬盘托，买来一块120G SSD畅享高速。 本人IT出身，因此想在电脑上装上Ubuntu，闲话少说，直入正题 首先是硬盘安装位置的选择，SSD装在主硬盘位置，原来的HDD卸下来装到光驱位上。主硬盘位为SATA3据说会快一些，但是最关键的原因是，HDD位貌似不能引导操作系统 SSD上分区装win7，一切都按照win7的安装方法来，我自己留出了300M的空间准备放置Ubuntu的/boot 从官网下载ubuntu，下载安装ultraiso软件，用ultraiso软件打开下载下来的iso文件，选择菜单中的“启动”–“写入硬盘映像” 弹出的窗口中，刻录校验打上勾，写入方式选择“USB-ZIP+”，进入便携启动，选择写入新的硬盘主引导记录（MBR）-USB-ZIP+，这一步会出现警告，不用管 设置完毕后写入 用U盘做好启动盘，插上电脑重启过程中按F12选择从U盘启动，进入Ubuntu选择安装 在“安装类型”当中选择其他选项，手动设置分区和启动 我的安排如下： 123456主硬盘SSD /boot 250M 副硬盘HDD / 25G /home 65G /swap 16G 分区时每次都是点磁盘中标识为空闲的区域建立分区，/作为主分区，swap分区选择用于交换空间，其他挂载点都是逻辑分区，空间起始位置，用于EXT4日志文件系统，下方“安装启动引导器的设备”选择主硬盘的/boot所在分区，进入安装过程 实际上Ubuntu默认的双系统方案是从Ubuntu引导进入win7，然而经过查证和试验，在双硬盘的情况下，我的电脑不能从光驱位硬盘引导，因此我把boot分区装在主硬盘，装完Ubuntu之后在win7中用EasyBCD做引导，就可以正常进入机械硬盘位上面的Ubuntu系统了。 Ubuntu启动后打开一个终端，输入sudo passwd root设置根权限用户密码，就能正常使用Ubuntu了]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Win7</tag>
+        <tag>双硬盘</tag>
+        <tag>双系统</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Ubuntu下的各个目录]]></title>
+    <url>%2FUbuntu%E4%B8%8B%E7%9A%84%E5%90%84%E4%B8%AA%E7%9B%AE%E5%BD%95.html</url>
+    <content type="text"><![CDATA[转载自网络 /这就是根目录，一台电脑有且只有一个根目录，所有的文件都是从这里开始的。举个例子：当你在终端里输入“/home”，你其实是在告诉电脑，先从/（根目录）开始，再进入到home目录。 /root系统管理员（root user）的目录。至于系统管理员的权限都多大我这里就不在废话了。因此，请小心使用root帐号。 /boot系统启动文件，所有与系统启动有关的文件都保存在这里 。 /bin这里是存放系统的程序。 /etc主要存放了系统配置方面的文件。 /dev这里主要存放与设备（包括外设）有关的文件（unix和linux系统均把设备当成文件）。想连线打印机吗？系统就是从这个目录开始工作的。另外还有一些包括磁盘驱动、USB驱动等都放在这个目录。 /home这里主要存放你的个人数据。具体每个用户的设置文件，用户的桌面文件夹，还有用户的数据都放在这里。每个用户都有自己的用户目录，位置为：/home/用户名。当然，root用户除外。 /tmp这是临时目录。对于某些程序来说，有些文件被用了一次两次之后，就不会再被用到，像这样的文件就放在这里。因此，千万不要把重要的数据放在这里哦。 /usr在这个目录下，你可以找到那些不适合放在/bin或/etc目录下的额外的工具。比如像游戏阿，一些打印工具等等。/usr目录包含了许多子目录： /usr/bin目录用于存放程序；/usr/share用于存放一些共享的数据，比如音乐文件或者图标等等；/usr/lib目录用于存放那些不能直接 运行的，但却是许多程序运行所必需的一些函数库文件。你的软件包管理器会自动帮你管理好/usr目录的。 /opt这里主要存放一些可选的程序。如你想尝试最新的firefox测试版吗？那就装到/opt目录下吧，这样，当你尝试完，想删掉firefox的时候，你就 可以直接删除它，而不影响系统其他任何设置。安装到/opt目录下的程序，它所有的数据、库文件等等都是放在同个目录下面。 usr/local这里主要存放那些手动安装的软件，即不是通过“新立得”或apt-get安装的软件。它和/usr目录具有相类似的目录结构。让软件包管理器来管理/usr目录，而把自定义的脚本（scripts）放到/usr/local目录下面。 /media这个目录是用来挂载那些usb接口的移动硬盘（包括U盘）、CD/DVD驱动器等等。]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[暑假的尾巴]]></title>
+    <url>%2F%E6%9A%91%E5%81%87%E7%9A%84%E5%B0%BE%E5%B7%B4.html</url>
+    <content type="text"><![CDATA[感悟 暑假的尾巴， 昨晚囫囵吞枣地读完一本《尘埃落定》，然后这个暑假就又有了一点玄幻的感觉。 一个半月的实验室生涯，在昨天中午的时候宣告比赛结束，我的暑假开始了 雨淅淅沥沥地下着，就是那种感觉，朦朦胧胧的，心里百感交集，关于各种得到和失去 从得知自己被推荐到国家评比的时候，就像麦其土司家的罂粟红艳艳地映红了整片原野，恍恍惚惚，一切真实而虚幻。朦朦胧胧地在实验室又忙了好些时间，然后得知再也不用忙了 问心无愧，我是靠自己笨拙而坚定地扇动翅膀，才走到这个地方的，我是几乎每天最早到达实验室开始忙碌的人，我是从无到有一点一点攒起来自己模拟电路功底的人，我沉醉于信号线里电流电压以每秒数亿次的频率跃动变化着，而我在示波器中像摆弄针线一般处理着这律动的音符 电设后期总是过着一种大起大落的过山车一样的日子，最后时刻做出来的更高指标然而没有时间组装了，初赛大受挫折然而还是晋级了，证件丢失火急火燎了两天幸亏找回了，在省前列推荐国家评比然而没能比得过别的省份 当我觉得一切都尘埃落定时，一阵风又吹了过来 早晨的中心校区 早晨的中心校区是极好的，暑假里有一半的时间，晨光熹微的时候从北门外走弘德大道到南门边上的信息楼，看大爷大妈们以各种方式进行奇特的晨练。特别记得有个肌肉健硕的大爷，每次走过的时候都能遇上他在晨跑，有时候在食堂北，有时候在小树林。晨光映照下通往环境学院那条路树上的叶子是红色的，就像梦境里一样。 而另一半的时间，早上在实验室醒来，看到从百叶窗倾泻进来的光芒。实验室的空调低低的鸣响，用于思考的头颅离开用于践踏的地板，于是新的一天就又开始了 杨老师杨老师是我遇到过的有意思的长者之一。一头飘逸的带着艺术家气质的长发和一脸沧桑的络腮胡茬，偶尔在实验室旁边的小房子里自斟自酌喝到微醺，想必是个有故事的人。杨老师是老山工的老教师，早已退休多年，却仍年年回来带电设。用他对我说过的话就是 “以为从此洗手不干了，东西都送人了，结果又回来了，哈哈哈哈哈哈….” 是的没错，他说的大多数话，后面总会跟着一串爽朗的笑，眼睛眯缝起来，说不出来是像弥勒佛还是像老顽童 是的，杨老师还像是个老顽童，茶余饭后不想干活的那半小时，杨老师会到实验室里跟我们聊天，海阔天空，聊他年轻时候的故事，聊电子科目的教学，抑扬顿挫，绘声绘色，像说相声一样，说到动情处，会自顾自地表演起来，噢，他表演过拧中周调无线电，表演过扛着小榔头去金工实习厂，说的最多的一句话就是，“继续努力，啊，哈哈哈哈哈….” 有一天要回山里，下着大雨打不到车，杨老开车把我们几个送回山里一一送到宿舍楼下。我细细想了想，杨老是我遇到过的第二个开私车送学生回住处的老师 有一次实验室里的扫频仪插头被压坏了，所有人一筹莫展，只会说一句话，等杨老师来看看吧。杨老师来了，锯挫钻钉，叮叮当当弄了一上午，午饭时分抱着修好的扫频仪回来了，满脸自豪地说，”这是三十年前师傅传给俺的手艺，没想到现在用上了，哈哈哈哈…“ 脸上的神情像孩子一样有趣 对自己所从事的工作充满激情的人，必然是十分快乐的 除了杨老，实验室还有头发花白的同样爱笑爱打趣的赵子老师，看了看我的身份证号，以一种慈祥而自豪的口吻说，我刚好比你大了四旬；还有骑着旧自行车的姜老师。这三个长者常常在实验室旁边的小屋里畅谈，开怀大笑。两个已经退休却年年自愿回来的长者，一个简朴纯真的老教授。我常常会想，他们三人组个队参加电设，肯定是很有意思的一件事 是什么驱动着这爽朗的笑谈在那小屋里年年响起呢？ 他们仿佛是来自武侠小说中的人 这张照片拍完后，杨老师眯缝着眼说，哎呦，都成糟老头子了哟哈哈哈哈,,,, 尾声尾声 突然就大三了，各种想说未说的感觉。大三这个词眼很刺眼，总是使人们莫名地皱一下眉头，时间过得可真快。]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>生活</tag>
+        <tag>我的大学</tag>
+        <tag>电设</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[龙舟]]></title>
+    <url>%2F%E9%BE%99%E8%88%9F.html</url>
+    <content type="text"><![CDATA[感悟 大概是在济南生活的时间长了，生活的浪潮一浪一浪地打来，一点点抹去了一年前对这个北方城市的那种好奇心。 又到了一年一度端午，突然变得无比想念家乡的龙舟赛。 很小的时候，龙舟赛还是在桂江举行，所谓“短龙”。母亲领着我去江边看的龙舟，印象中那时候龙舟像牙签那样细长，在江心一上一下地晃悠前进，船上的锣手和舵手伴着龙舟的浮沉，铿铿地敲打着，一群汉子，手臂整齐划一地捣进江水里，翻起一阵阵碎玉，很快就到了终点，然后对岸领奖台那边传来欢呼和鞭炮声。母亲说，他们抬着烧猪和烧酒回去了。 母亲说她们小的时候，龙舟赛并不是在桂江上的“短龙”，而是从长洲头放龙，一直划到系龙洲，所谓“长龙”，还跟我说，她们小的时候，骑着单车从洲头追着龙舟追到洲尾。我似懂非懂，“长龙”好像真的很长吧，那一段水路，小时候跟母亲进城卖菜的时候坐着机船，要坐好久好久的。 然后父母亲越来越奔忙了，家搬了，我小学毕业了，上初中了，上高中了，防洪堤修起来，桂江水涨了又落下去好多次，木棉花红了又掉下去一批批，姐各奔东西各有了各自的生活。生活的浪潮一浪一浪地打来，那种微妙的情怀，就像那牙签那么细的龙舟，在江心晃啊晃，又像湍流中的一片小树叶。活在湍流中的小树叶又怎么能左右生活的浪潮呢？ 反正是再也没有看过龙舟。 好些年过去了，“短龙”又改回了“长龙”，而我，也都高中毕业了。 高考完那一年外公说要看龙舟，爸妈不放心，刚好我也考完高考，就陪着外公挤到江边看龙舟。外公90多岁的人了，颤颤巍巍挤到江边防洪堤上，我兢兢业业地跟在他身后，旁边的大叔都忍不住对我说，小伙子你看好这个老人家啊。 那是我第一次看母亲好多年前告诉我的“长龙”。十点多的时候，龙舟来了，飞舟遏浪，呐喊声声。这时候外公突然从口袋里摸出一片小纸片，口中喃喃有词，“我昨晚看电视的时候都记下来了，看，蓝色的是长洲队，紫色的是龙圩队，咦，那个黄色的是什么队来着？”我不禁哑然失笑。 生活的浪潮兜兜转转，又以另一种姿态把我推回到那江边的龙舟赛，蜻蜓点水地让我看了一眼龙舟赛，又推着我漂摇到这遥远的北方来。 去年的龙舟赛是怎么样的呢？外公有没有记下来哪个颜色是哪个队呢？ 想象戛然而止，一切不得而知。 今年的龙舟赛又到了，突然好想念。上网查了查济南的龙舟赛，不禁怅然。还是怀念家乡的龙舟赛，长龙，7500多米，一声炮响，十多条龙船群龙疾驰，每船20多人，整齐划一。 说不出喜欢龙舟赛的什么，可是就是觉得亲切，大概就是，家乡味。 故乡的一点一滴就像风筝线，看不见，却挂肚牵肠。]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>生活</tag>
+        <tag>民俗</tag>
+        <tag>家乡</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[物联网云平台调试手记]]></title>
+    <url>%2F%E7%89%A9%E8%81%94%E7%BD%91%E4%BA%91%E5%B9%B3%E5%8F%B0%E8%B0%83%E8%AF%95%E6%89%8B%E8%AE%B0.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 乐联网： 使用TCP/UDP Socket调试工具创建连接，地址www.lewei50.com，端口80 上传数据，数据格式 1234567POST /api/V1/gateway/UpdateSensors/01 HTTP/1.1 userkey:6ff-----------9998fd1a9239e9a6 Host: www.lewei50.com Content-Length:29 Connection: close [&#123;"Name":"AA","Value":"122"&#125;]]]></content>
+      <categories>
+        <category>物联网</category>
+      </categories>
+      <tags>
+        <tag>物联网</tag>
+        <tag>云平台</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[GSM模块联网 GPRS上传物联网云平台调试笔记]]></title>
+    <url>%2FGSM%E6%A8%A1%E5%9D%97%E8%81%94%E7%BD%91-GPRS%E4%B8%8A%E4%BC%A0%E7%89%A9%E8%81%94%E7%BD%91%E4%BA%91%E5%B9%B3%E5%8F%B0%E8%B0%83%E8%AF%95%E7%AC%94%E8%AE%B0.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 之前试过用路由器上传数据到物联网云平台，由于wifi限制，用GPRS流量上传会更具优势，因此尝试用流量上传数据到物联网云平台 在物联网云平台注册好帐号后获得API地址和userkey 联网测试用sockettool工具测试好上传成功的数据格式 用GSM调试工具把相应数据发到网上尝试。 经过调试，几大物联网云平台能用的上传数据格式如下： 乐联网1234567POST /api/V1/gateway/UpdateSensors/01 HTTP/1.1 userkey:×××××××××××××××××××××××× Host: www.lewei50.com Content-Length:29 Connection: close [&#123;"Name":"AA","Value":"122"&#125;] Yeelink1234567891011121314151617POST /v1.0/device/180××/sensor/357××/datapoints HTTP/1.1 U-ApiKey:××××××××××××××××××××××××××××× Host: api.yeelink.net Content-Length:51 Connection: close &#123;"value": &#123;"lat":39.4321,"lng":116.3451,"speed":0&#125;&#125; POST /v1.0/device/180××/sensor/314××/datapoints HTTP/1.1 U-ApiKey:×××××××××××××××××××××××××××××× Host: api.yeelink.net Content-Length:14 Connection: close &#123;"value": 394&#125; 在下位机中先AT命令让GSM模块进入GPRS传输，然后传送以上数据就能上传至云平台]]></content>
+      <categories>
+        <category>物联网</category>
+      </categories>
+      <tags>
+        <tag>物联网</tag>
+        <tag>GSM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[OpenCV + OpenWRT 无线摄像头监控和图像处理]]></title>
+    <url>%2FOpenCV-OpenWRT-%E6%97%A0%E7%BA%BF%E6%91%84%E5%83%8F%E5%A4%B4%E7%9B%91%E6%8E%A7%E5%92%8C%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 第一次写这样类型的文章，不合规矩之处敬请大家多多包涵，闲话少说，直入正题 【OpenCV】曾经用Matlab做过简单的图像识别处理，后来发现OpenCV更为成熟和易用，因此转投OpenCV。最近准备学校的科技创新大赛，打算做关于图像识别的东西，刚好又要学OpenCV，因此从这里入门 【OpenWRT】OpenWRT是广泛使用的开源路由器操作系统，因为开源所以强大。 手头有一台MW151路由，据悉该路由与TP-Link 703n的区别只是USB口，改装升级内存和flash，刷上703n的OpenWRT固件，一台适宜开发的设备诞生了。 【步骤：路由】路由器上的原材料： 703n固件 mjpeg-streamer软件 免驱摄像头（笔者使用的是某宝上淘来的东芝笔记本拆机摄像头） 首先要实现图像传输需要在路由上挂载USB摄像头 ### 1.安装mjpeg-streamer讲软件解压，把其中的www目录放到路由器的www目录下，改名为camwww，向路由器上传文件可以用WinSCP，重启路由 ### 2.插好摄像头开机，启动mjpeg-streamer，ssh登陆路由（可以用Putty软件ssh登录）输入以下命令 1mjpg_streamer -i "input_uvc.so -d /dev/video0" -o "output_http.so -p 8080 -w /www/camwww" 8080指视频流使用端口，可以自定义，其余选项为默认分辨率640x480，30fps 用户可以根据自己的需求自定义，例如 1mjpg_streamer -i "input_uvc.so -f 15 -r 320*240 -d /dev/video0" -o "output_http.so -p 8080 -w /www/camwww" 表示分辨率320x240，15fps这时候可以看到摄像头的LED被点亮，结束操作时按Ctrl+C键可退出mjpg-streamer 此时用浏览器（建议用火狐）连接路由器打开以下地址，可以查看摄像头的实时图像 1http://192.168.10.1:8080/?action=stream 192.168.10.1是路由器地址，8080是刚才设置的stream端口 至此，OpenWRT已经实现挂载摄像头进行无线监控。 【步骤：OpenCV】电脑是已经安装好Visual Studio 2013并配置好OpenCV 2.4.10 要用OpenCV对路由器传输的实时图像进行处理，只需要让程序从网页获取图像，在while循环里不断把采集的图像转换成Mat矩阵（新版本的OpenCV正在逐步淘汰IplImage结构体）既可，令人欣喜的是，OpenCV里的VideoCapture类本身就能从网页获取图像，因此带来了极大的方便，具体如下： 123456789101112131415161718192021222324252627282930313233343536373839#include "opencv2/highgui/highgui.hpp" #include "opencv2/imgproc/imgproc.hpp" #include &lt;iostream&gt; #include &lt;stdio.h&gt; //头文件 using namespace std; using namespace cv; /** @function main */ int main(int argc, char** argv) &#123; Mat src; cv::VideoCapture vcap; const string address = "http://192.168.10.1:8080/?action=stream?dummy=param.mjpg"; if (!vcap.open(address)) &#123; cout &lt;&lt; "Error opening video stream" &lt;&lt; endl; return -1; &#125; cout &lt;&lt; "Stream opened" &lt;&lt; endl; while (1) &#123; vcap &gt;&gt; src; // your code here /// Show your results namedWindow("Cam", CV_WINDOW_AUTOSIZE); imshow("Cam", src); if (waitKey(2) == 27) break; // Press "Esc" to exit &#125; return 0; &#125; 上文中如果address直接等于浏览器地址栏中输入的地址，将不能获取图像，一个解释是，需要让程序知道视频流是jpeg类型，因此“伪造”了一个jpeg文件名 下图是修改OpenCV官网的一个demo，亲测在路由上获取图像可行（分别从笔记本摄像头和路由器挂载的无线摄像头）]]></content>
+      <categories>
+        <category>图像识别</category>
+      </categories>
+      <tags>
+        <tag>图像识别</tag>
+        <tag>OpenCV</tag>
+        <tag>OpenWRT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[物联网开发入门记：OpenWRT读串口数据curl上传到云服务平台]]></title>
+    <url>%2F%E7%89%A9%E8%81%94%E7%BD%91%E5%BC%80%E5%8F%91%E5%85%A5%E9%97%A8%E8%AE%B0%EF%BC%9AOpenWRT%E8%AF%BB%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AEcurl%E4%B8%8A%E4%BC%A0%E5%88%B0%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0.html</url>
+    <content type="text"><![CDATA[来自https://www.hsli.top 物联网成了当下越来越热门的话题，也有了已经建成的物联网服务平台，把各种设备连接到互联网似乎成了一种潮流，今天我也尝试物联网的应用开发。 还是选择做在openwrt上，开源的路由器操作系统，基于linux，可扩展各种软件包，不二之选 cURL，优秀的跨平台开源文件传输工具 yeelink和乐联网，这两家服务平台今天都分别试了一下 首先关于openwrt路由中串口的读取： 之前看过openwrt通过串口控制下位机再控制小车的教程，只涉及到从网页端控制串口，而读取串口几乎没有现成的教程，经过一番苦苦寻找和尝试，得到以下两种方法： 使用lua语言编写脚本test.lua，代码如下： 1234567rserial=io.open("/dev/ttyS0","r") while true do data=rserial:read(); rserial:flush() print(data) end 在shell里cd到test.lua所在目录下，运行lua test.lua即可读取串口，特别需要注意的是，每从串口向路由发送一个数据一定要跟一个回车才能发送成功，我因为这个折腾了很久，而这段代码实际上是打开了一个从串口的shell，从串口输入的字符不仅会被获取并显示出来，更会作为shell命令来运行！！简直不可思议，也就是说如果你串口输入的字符串是reboot的话，路由就重启了。。。 1cat /dev/ttyS0 在shell中输入以上命令就可以获取串口输入，竟然是这么简单！ 好了，言归正传，获取了串口传来的数据，接下来就是上传了 在openwrt下先得安装curl软件包，然后就可以用curl上传下载数据甚至文件了 在openwrt选一个目录新进uplode.sh文件，修改属性为0777，输入以下代码（以乐联网平台为例） 123456789101112131415#! /bin/sh sensor_name='你的传感器名称' API_key='你的密钥' API_address='http://www.lewei50.com/api/v1/gateway/updatesensors/01' while true do echo "waiting for input" &gt; /dev/ttyS0 cat /dev/ttyS0 &gt; /mnt/a &amp; &#123; sleep 6 ; eval 'kill -9 $!' &amp;&gt; /dev/null ; &#125; read value &lt; /mnt/a curl --request POST $API_address --data "[&#123;\"Name\":\"$sensor_name\",\"Value\":\"$value\"&#125;]" --header "userkey:$API_key" sleep 10 done cd到该目录，sh upload.sh即可运行，用USB-TTL线连接到路由的串口，设置好波特率，看到串口显示“waiting for input”就输入一个数，这个数就会被上传到你的乐联网平台上，十分有趣（关于该平台中添加设备和传感器的方法不再赘述） 完成这些工作后，在该平台上就能看到串口发来的数据了，要是串口上接一个单片机，单片机下连接温湿度等等各种传感器，玩法就多种多样了 读取上传的数据 数据上传到云平台之后，有时候需要自己进行一些处理分析，这时候就要从云平台上读取下来，以yeelink为例 1curl --request GET --header "U-ApiKey: 密钥" http://api.yeelink.net/v1.0/device/设备编号/sensor/传感器编号/datapoint/ 改命令能得到时间和数值 另外还能用 1curl --request POST --data-binary @"图片文件完整路径" --header "U-ApiKey: 密钥" http://api.yeelink.net/v1.0/device/设备编号/sensor/传感器编号/photos 来上传图片文件，这个可以用于一些监控产品的开发]]></content>
+      <categories>
+        <category>物联网</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>物联网</tag>
+        <tag>curl</tag>
+        <tag>路由器</tag>
+        <tag>传感器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[风华正茂 岁月峥嵘]]></title>
+    <url>%2F%E9%A3%8E%E5%8D%8E%E6%AD%A3%E8%8C%82-%E5%B2%81%E6%9C%88%E5%B3%A5%E5%B5%98.html</url>
+    <content type="text"><![CDATA[感悟 过去半年多了，每次走到工训还是能感受到那余音绕梁一般的温暖 暑假就没睡过多少好觉，一个月在外浪迹，一个月睡实验室。怎么都忘不了那种早上醒来一下没反应过来睡在哪里的颠沛流离感。 来得有点不经意，去了一个月远征，暑期学校的培训我就落下了一个多月，本以为和电设2014无缘了，老师说，你就来吧，于是就有了这另一个月的颠沛流离。 记得第一个晚上没带够被子，结果当晚济南就降温，盖了件衣服随便睡了睡；出来吃饭没带伞，下雨了直接冲去工训全身湿透的时候；抱着笨重的台式机从宿舍磕磕绊绊到实验室；迎新的时候，外面在热火朝天欢迎学弟学妹，实验室也在热火朝天做最后的调试，工训409，俨然成了一个世外桃源。 还是没法把那种感觉写出来。 中秋节，实验室简单的布置了一下，一人发一盒饭两个月饼就在实验室过了这个中秋节，走到天台上给家里打了个电话，那边老父母厮守着吃下没有团圆的团圆饭，空巢老人…唉，一年不回家呢，好感慨。放下电话，心里很不是滋味，吸一口气，继续钻进那代码海洋。情人坡那边打来电话，伙伴们约出来一起吃月饼，今年中秋和大家一起吃的月饼是赛赛家自己做了带过来的，情人坡黑灯瞎火，铺开防潮垫（有防潮垫吗？好像有）就坐下来吃，聊天，说话，都是好久不见。回了实验室又打了好长的电话……然后呢？继续改程序到深夜，和往常一样。 中秋大合照，我和鹏哥捧着个示波器，那时候远征回来的黝黑肤色还没有褪去。 这就是中秋节的实验室过法，说不上特别，可是怎么就这么难忘呢？ 比赛日，前一天晚上很晚才睡，实验室整晚的灯火通明，调试的时候一回头，噢，秦老师也没睡，陪着大家，端着个单反笑吟吟的在拍照。比赛日，坐上车去淄博，在车上我一直在极力寻找今年五一骑车去东营的时候走过的景色，还真发现了几处是挺相似的。半天，到淄博了，山东理工大学，山大的空调大巴校车停在车坪上，和别的学校的专车比起来果然气度非凡。答辩，和曾经经历过的各种科创类比赛答辩流程大体一样，中午拿着学校发的餐费换了餐票在山东理工吃了一顿饭，不得不说山理工食堂那真是挺坑的…下午结束，出来时干净利索就把作品拆了，一人端着一块上车回校，哦，比完了… 专车穿过夜幕奔赴济南。不知为何，坐夜车总会觉得好孤独，外面流光溢彩的，连续几天熬夜，精神紧张，感觉好累。忽然远征队群里热闹起来，哦，远征队第一次聚餐，好可惜去不了了……队友把座位空出来，手机摆上照片，一个都不能少。哈哈哈，就是这么可爱。果然相依为命走过千山万水，回来后时间越久感情越是深厚。百感交集。 终于回到学校了，大一的孩子们还在军训，我们的专车气派地打断了他们的训练，从他们的队列中穿过去，哈哈，真有意思。回到实验室，放下东西，吃个晚饭回到实验室，打开电脑，噢，不用调程序了…… 实验室成了一个神奇的地方，吃饭，睡觉，洗漱都在那解决了，也就变得特别的亲切。从淄博比赛回来的那个晚上，该回宿舍睡了可我还是在实验室多睡了一晚，被褥电脑洗漱用品什么的都在实验室了——那一刻发现人要是凑活过的话需要的东西真的很简单很少。第二天醒来走过来实验室一看，灯没开，没人。熟悉了那种早上洗漱完拿着早餐过来这里热热闹闹，敲代码的，焊电路的，调试的各种人的场景，这么长时间以来每天都是这样，而此时此刻就是一种人去楼空的感觉，好惆怅，好孤独。 哦，结束了，电设结束了，大家都走了，我也该离开了，工训409…… 分别时老师满怀惆怅的说，以后常回来工训看看…… 半年多了，每次回到工训4楼，睡觉的417，老师办公的415，实验的409，好熟悉的感觉。现在409已经收拾得干干净净，还是好怀念睡在宽敞昏暗的417，在灯火通明热火朝天的409调程序，到415拉开抽屉翻找元器件……地方住久了，有感情了。 虽然只是个省赛，虽然拿的奖差强人意，在别人眼中看来也许不算什么，可是那一个暑假真的好快乐好自由。]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>我的大学</tag>
+        <tag>电设</tag>
+        <tag>竞赛</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[远征 骑行 成都-西安-青海湖]]></title>
+    <url>%2F%E8%BF%9C%E5%BE%81-%E9%AA%91%E8%A1%8C-%E6%88%90%E9%83%BD-%E8%A5%BF%E5%AE%89-%E9%9D%92%E6%B5%B7%E6%B9%96.html</url>
+    <content type="text"><![CDATA[骑迹 凌晨2点，经过26小时的火车旅行，信步走出济南站，泉城还在宁静的熟睡之中。山大车协2014远征就到此告一段落了。耳畔仿佛还回想着呼啸的风声，声嘶力竭的口号，加油和歌声…… 我该拿什么来纪念生命中这浓墨重彩的豪放一笔？拿什么在日后悠长的岁月长河里唤起脑海中那片湛蓝的天空，碧绿的草原，那一群可爱的兄弟姐妹？ 远征前如果说高考之后很少有聚精会神去完成一个任务的机会，那么远征算是一个例外。药乡选拔，酷烈的阳光把水泥路炙烤得惨白，山坡蜿蜒而上似乎永无尽头，低头一下下骑车爬坡，天地间只剩下自己急促的呼吸声和轮下惨白的水泥路。选拔之后到远征前为了保持和提升体能，晚上夜凉如水，和众人去跑操场12圈，偶尔跑着跑着附近就只有自己，听着自己的呼吸，感受着跳动的脉搏，脑海里想着渺远的青藏高原和那神秘的远征。一抬头，一轮明月，自己仿佛在追随着月亮在跑。从未如此真切的感受到追逐感的微凉与温馨。就这么追逐着月亮，跑着跑着跑进了远征开始的日子······ 景物篇芙蓉城 成都早闻说成都慢生活，休闲而自在，果然如此。城市里广泛使用的玻璃幕墙把祖国西南这一颗明珠包装得晶莹剔透，而亚热带季风湿润气候带来的淅淅沥沥的小雨又把她清洗得干干净净。成都真的很干净，街道干净，市容整洁，连上世纪风貌的旧建筑也见不到别的地方常有的污垢和水渍。春熙路，宽窄巷，步履轻盈而斯文的成都人川流不息，各类商店充斥着新锐的创意，如果不是路人轻柔的脚步和路旁琳琅满目的小吃店，真让人突然感到似乎置身于东南沿海生活压力极大的新锐城市。而这里，在代表着新锐与现代的光鲜亮丽的玻璃幕墙外表下成都人悠然地生活着，偶尔看见有保镖看守着的神秘高级会所透露出其雄厚的资本，成都有丰富的夜生活，成都人会吃，爱打麻将，富庶的成都平原有资本供养起这美丽的城市和悠闲地生活。 走进天府广场，才发现成都慢得丰厚。城市中轴线两旁高楼林立，天府广场以一种平和温婉的成都方式告诉你，我以天府自居，毋庸置疑。秀气，富饶，悠闲而多彩的成都。 绵阳梓潼我是第一次听说这个县城，这并不影响她给我带来触动。是否四川的城市都那么爱干净？这只是一座县城，然而有着成都那样干净整洁的街道，房屋簇新，自行车道和公交站牌轻轻地错开，不用拥挤不用担心，轻轻地，慢慢地就能穿行于这座小城。小巷里树底下悠然拨拉着大葵扇的大爷大妈搓着麻将，干净整洁，外形统一的人力三轮散发出一种悠然自得的生活气息。 沿国道过来的风景让我突然觉得似乎回到了家乡，那熟悉的稻田，池塘，砖瓦房…想起在成都看见的紫荆花，中午在绵阳还吃上了久违的苦瓜和南瓜，突然就有一种回家的感觉。 剑门蜀道离开梓潼，地形开始变得狰狞。呵，这就上剑门了，天下雄关啊。梓潼到剑阁这一段路，一路都是不停地上坡下坡。走出平原地带，才突然意识到远征意味着披荆斩棘。剑阁峥嵘而崔嵬，国道在丛林中蜿蜒前进，山接着山坡连着坡，药乡与之一比顿时黯然失色。傍晚时分到达剑门七十二峰观景台，远眺朦胧的地平线，墨绿色的山像波浪一般起伏，又像刀削一样险峻。现在的我已经无法写下当时的感动了，因为那种惊叹已经被而后的秦岭和青藏高原所稀释。远征路上就是不断地否定心中的壮美，曾经感叹怪坡的艰辛，在药乡才发现怪坡连大海中的一片浪花都不如，到剑阁发现药乡不过是小土坡而已，秦岭，自知人这一生时间，空间与见识的渺小；青藏高原，到这里已经不再感到惊讶了，心中开始笃信，这世界上一定会有比青藏高原更壮阔的景观，就像青藏高原比心目中高峰一样的秦岭更伟大一样。 剑门蜀道，就这么安静地躺在这里。走出剑阁之后，还能看到身后的山像屏风一样环抱着这座小城镇。 想起清明时节登泰山，怀着一股“登泰山而小天下”的欣慰。现在才发现，大道无形。泰山的形象只留下熙熙攘攘的人群和嘈杂的声音。也许是因为泰山太出名，太聒噪，反而失去了大山应有的稳重与深厚。更为可笑的是，泰山之上有公路直修到中天门，然后有缆车直登极顶，也就是说不费吹灰之力就可以登顶泰山，山上几乎每处石头都有名人留字，看着有一种说不出的不爽。 而剑门蜀道，登临此处只觉得天地怆然，人烟稀少。平整的国道上少有车辆来往，却遇见了不少骑行川藏的勇士，风尘仆仆，或是我们下坡他们上坡，或是他们爬坡我们下坡。迎面相遇，不用太多言语，高举拇指，大喊一声“加油，坚持，前面就是下坡了……”简单而雄壮。 汉中这只是一个沿途休整的小城，本以为不会留下很深刻的印象，想不到竟然也挺难以忘怀。透着历史的书卷气息，汉中虽然没有四川的清静灵秀，仍有着别具一格的吸引力。昔日明修栈道，暗渡陈仓，刘邦逐鹿中原，平定三秦，一统天下，大汉天威四百余年源远流长，才有了今天汉族，汉人，汉语，汉服，汉文化的称谓。而后诸葛亮鞠躬尽瘁，死而后已，不远处岷县“天下第一武侯祠”也曾在我们的骑行中飞速掠过。作为汉文化的发祥地，汉中隐隐透露着历史的厚重感。 秦岭沿着嘉陵江骑行，左边是奔涌的嘉陵江，右边悬崖峭壁，头上是高架桥，河对岸火车呼啸而过。108国道慢慢延伸到山区，在崇山峻岭中蜿蜒而行，汉水源，陕西界，羌南风光······呵，秦岭终于来了。横卧在川陕之间，不再是四川那种绵软的泥土山，而成了刚硬的石头山。G108在其中蜿蜒行进，数不清的上坡下坡…… 没有一块刻着名人手迹的石头告诉你啊这是什么什么景点，没有一个谁谁登临处说哪个伟人曾经到此一游，秦岭她就这么安静地躺在这里，来到的人自然会体会到她的伟大，没到的人也能知道她是南北方气候直截了当的分界线。驾车的人只知道飞驰而过，感受不到攀爬的艰辛，只有凭借人力的攀援，才能真切地感受大自然的搏动。 路上遇见了几个徒步翻越秦岭的行者，还有好些骑友，依然是一声吼，“加油，快到顶了！”下午遇到一个同去西安的云南骑友，因为那天打前站，要求争取时间速度快，聊了几句他跟不上我们的节奏，便草草分别了。 连绵的秦岭，只不过是大自然的一道皱褶。天地之大，人之渺小。然而，人也是最强大的。每一个山坳里都会有一撮一撮顽强的人家，还有小学，明艳的国旗顽强地飘扬在深山老林中，有时候路过村落，路旁的小孩子惊喜地尖叫着，飞跑着，数着“一辆，两辆，三辆，四辆，五，六，七……”。某次下坡时突然看见一老一少，老人须发花白，背上背着个药娄，小孩子跟在老者旁边，仙人般飘逸。 翻越秦岭那一天我打前站，翻过去那天30公里一直上坡然后一直下坡，直截了当，干净利索。蜿蜒向上的国道看不见头，爬上去大汗淋漓，蠕动般的速度向上骑行，无数飞虫在眼前飞来飞去。终于登顶秦岭了，身为前站，飞驰下坡，黑河像小溪般涓涓流淌，有时候国道上前后十多公里没有人没有车没有房屋，一抬头只看到陡峭的山崖，和灼目的烈日。中午没有补给，不得不吃备餐。野旷无人，耳畔只有虫鸣鸟叫，风声呼呼，流水潺潺。 秦岭就这么过去了，2天翻越。也是因为见过后来的青藏高原，秦岭的印象模糊了，只有上坡下坡，密林，怪石嶙峋，人迹罕至。 大唐长安请允许我固执的用这个地理位置上并不太恰当的名字来称呼西安，总觉得西安二字听起来有点秀气，大唐长安，这么叫才对得上她留给我的大气印象。 也许是秦岭隔断了南方那种阴柔的细雨和性格，也许是关中平原八百里秦川，金城千里，天府之国（渭河平原比成都平原早半个多世纪获得“天府之国”的美称）给了她毫不畏缩的雄厚资本，也许是秦汉唐以及十三朝古都威武的历史积淀让她有着气度不凡的威仪。西安给我的感觉就是大气磅礴，一拿出手就是亚洲最大的喷泉，亚洲最大的室内LED天幕，亚洲最大的火车站。 西安的大气造就了她开放包容的气度，回民街里熙熙攘攘，充满着异域风情，西安城的名胜古迹保留的很好，亭台楼阁毫不掩饰地告诉你这里曾经的威仪天下，古城墙上依然旗号鲜明，仿佛将士们还在驰骋沙场。大明宫，气势磅礴，一望无际，面积为故宫的4倍之大，大唐长安就是这样，根本不用掩饰她的雄伟。城墙之上能看到南边天际间秦岭像一道屏风，绵亘延伸。 甘南，黄南藏区不知又爬了多少坡，翻了多少山。到这时爬坡的心态已经发生了变化，无论是5公里的上坡，10公里的上坡，还是十几几十公里，只要慢慢爬，总是能爬上去的，稳住呼吸，一下一下踏实的踩踏，山登绝顶我为峰。爬上了一座座高峰，就可以享受一段舒爽的下坡了。 黄昏时分，到达黄南藏区，社会实践3天。 飘扬的经幡，长跪不起的虔诚信徒。 这一片与世隔绝的神秘土地上，还保留着原始的热贡文化。我们的技术员去买辐条的时候听说，前些天热贡六月节，当地人买走了很多辐条，磨成长针，在六月节上青年男子把针穿透嘴巴以示勇敢，代表响应二郎神的召唤前去征战。若不是在土族人家亲眼所见带血的长针，真的难以置信这种只在电视上看过的情节。 黄南藏区内，寺庙林立，僧侣随处可见，民风淳朴，社会实践时随手敲开一家土族人的家门，他们便热情邀请我们进餐，当地的糌粑，为高原而生，能量高体积小。藏文，唐卡，刺绣，堆绣……大唐文成公主进藏时发源的宗教艺术，到现在带着亘古的馨香来到我们面前。精致的唐卡倾注了艺人的心血，一针一线，往往一个多月才能制出一幅小唐卡，大型的唐卡，需要几个人耗时半年或一年才能制作出来。 与当地人交谈，在这个远离喧嚣的地方，发现这里的人都很爱笑，容易满足。与一个货车装卸工聊天，老工人总是呵呵的笑着，生活很苦，可是他挺满足，最后分别时还想请我们吃西瓜。越是生活困难，当地人越是信仰自己的宗教，越是心存幸福。 幸福到底来源于富足还是来源于满足呢？ 好一片与世隔绝的宁静与神秘。 青藏高原（青海）终于到了这个神圣庄重的名字，最接近天空的地方。 首先是九曲黄河第一弯，走出黄南不久就看到一条蜿蜒的小溪——对，那是黄河。此时的黄河河水清冽，只是一条一脚就可以把石子踢到对岸的小溪流，两旁崇山峻岭，悬崖峭壁。 河流就是这样，年轻的时候势单力孤，在山间艰难地回转，不懂事地发出各种聒噪。这时一块大点的石头都可以改变她的流向，而此时正是她充实自己的时候，见识过了悬崖峭壁，名山大川，经历过了激流奔涌，撕心裂肺，磨难和见识多了之后，她变得宁静，沉稳，不再细细地叫唤，而是静静的流淌，大道无形。而此时安静的她，却已经是势不可挡，大道无形。君不见历史上的黄河改道，“黄水源源不绝，前涨未消，续涨骤至，村落被冲，瞬成泽国，极目所至浩淼无涯；灾民皆散处山麓高原，搭盖窝棚，暂为栖止”。 高处不胜寒。有一天早上爬到海拔3200处，码表显示温度4度，穿行云中，能见度不过10米，云雾缭绕，手指冻僵。忽然一阵风吹来，云雾马上散开，不足10秒，天清日朗，马上看到了周围的山崖和手机信号塔，蔚为奇观。能明显的看到云的分界线，云低低的飘在山腰上，仿佛伸手可得。这里的景色已经与秦岭大相径庭，山上再也看不见树木哪怕是低矮的灌木。连绵铺开的只有草地，从云中延伸出来的草地，像一块完整的绿色绸缎松松垮垮随意地披在大地起伏的肌肤上，牛羊猪马像一粒粒，一簇簇小爬虫，可怜地蠕动着。我们呢？银灰色的国道笔直地撕开这一片绿直指地平线，艰苦地攀援，阳光强烈，寒风凛冽，气喘吁吁。 一片蓝，一片绿，一条银灰的笔直的国道插入地平线，简单大气。 在这里爬坡，没有树木和山弯，能看到国道沿着山坡盘旋而上，在坡底看起来真令人绝望，慢慢爬上坡顶之后，极目远眺，天似穹庐，天地之大，人之渺小，只想放声长啸。也难怪当地的歌声都是高亢嘹亮的。 这么大的天地，让人油然而生一种悲怆与渺小感。当地人都有宗教信仰，甚至据乡镇领导说还保留着天葬的习俗，牛羊马自然死后骨头被供奉起来。天地太伟大了，人算什么？人世间那一点烦恼还算什么？ 《平凡的世界》，金波那如梦如幻的青海爱情故事。人间多么艰苦的情结投掷于这片渺远的天地，都只配得上用“沧海一粟”来形容。8年的牵挂，8年缭绕的歌声又能算什么？窃以为金波看到这一大片天地一定会释然的。 人在迷离中才会反思，在觉得自己渺小的时候才能看清自己，金波在辽阔的大草原才感到自己那份感情的渺小，王满银，则在喧嚣的都市中突然有了一种无力感，才发现人这一辈子该拿起什么，该放下什么…… 人很渺小，其实也很伟大。当看着这壮阔的天地时人会发现自己的无力，而当这一片壮阔向人发起挑战时，人的意志又能战胜一切。 海拔3000多，大风大雨，全身湿透，上坡累，下坡冷，豪迈的歌声，震彻云霄的加油。硬是爬完了一个又一个的坡…… 青海湖作为远征骑行的终点，来到时却没有想象中的激动。心怡说，远征看过那青藏高原之后，以前看过的风景再也不算什么了。也许是这个原因，也许是神秘的青海湖只留下了两天的印象。 第一天雨骑，大风大雨，步履维艰，记得的只有故事没有风景。 第二天多云，骑友，草原居民占据了大部分的记忆，青海湖只是娇羞的露了一下脸。 第三天，再也看不见青海湖了。 环青的国道距离青海湖很远，只能看到一片片油菜花后面有一面明亮的镜子，隐隐约约，神神秘秘。距离最近的一次能看到微微的波浪。走近青海湖要收费，无数自驾游的旅客风光地向我们喊加油。这种声音听起来不一样，我们是他们的风景，被他们的相机收进他们只有愉快舒适的环青记忆里；而在剑阁，在秦岭，在高山上向我们喊加油的长途骑友，喊出的是一种他乡遇故知的悲怆豪迈，苦涩与坚忍。 故事篇其实远征一路，记忆最深刻的不是风景，而是那些人，那些事。可是偏偏这些故事写下来在篇幅上又不能和景物篇相提并论，只好自己留在心中，留住那风声，呐喊声，歌声。 没有亲自走过，真的不会知道这一路远征有多艰苦，多感动，说起来往往男默女泪。 出发之日，车协的伙伴前来送行，我们坐车去火车站，他们骑车一路追随。车协人就是爱拼命，从车的后窗看出去，一队人马紧紧相随，夜晚的霓虹映照出坚实的肌肉线条和流动变幻但是坚不可摧的队形，风驰电掣，流光溢彩。我们高升叫喊着加油，这一场送别特殊而刻骨铭心。队友们硬是凭靠人力，和我们坐的汽车同时赶到火车站。 每到爬坡的时候，队里总会喊加油，每到艰难的时候，队里总会唱歌。男生陪女生，推女生，寂静的山野被一片鼓劲声沸腾起来。 每天晚上开会，多少年后我们都还会记得，一屋子人，脚伸在同一个被窝里，听着彼此的呼吸感受着彼此的温度，敞开心扉娓娓道来自己一天的感受乃至自己的理想，车协人以诚相待，总喜欢默默地付出。每个人都在休息，技术员在孤独地补备胎；每个人都在聊天，队医走出温暖的屋子补充买路上的常备药；每一餐无论大家多饿都要等到追队的人来到才一起开始吃；每一个女生爬上坡顶都有一大群人热情的欢呼鼓励；当后骑每一次追上大队都有温暖的问候；备餐不够吃了总有人抢着回答我还有我还有吃的……我知道欢猪要考注会证，要读人大的研究生，我知道小萌哥要在二十一二岁的时候成为一名好车手，明年要再打破药乡的记录，我知道尼玛和照领他们竞技部钢铁般的情谊……或是昏黄或是苍白的灯光，房子外面高原的寒风呼呼叫嚷，那又算什么。亮队长说的，相依为命。 在元龙镇，见识了远征路上最脏厕所，那一天大家都淋雨了，中午睡在民居屋檐下，下午出发前屋里大姐端出一杯热水，可是大家谁都不喝，一杯水递来递去给队友暖暖手。 从岷县出来去夏河县那天，本以为下午的路很长很难走，可是下完一个坡突然看到路牌，夏河30km。总是有意想不到的惊喜或惊险。 一路上主食从米饭到馒头到大饼馍馍到面食，还有幸尝到了糌粑，可是吃的菜总是川菜统治宇宙，每一个答应米饭供应管饱的老板总会后悔得肠子都青了。 远征路上的别人。在周至县，中午休息本打算在县政府外席地而睡，没想到政府办公楼里的公务员主动把我们让进有空调的办公室，像父母看着孩子一样慈祥地让我们好好休息，出发时财政局的阿姨主动提出来一大壶热水和一壶在我们睡觉时悄悄准备好的凉开水给我们路上喝；路上队员不舒服或者有意外拦下过不同的好心车；还有一路上给我们加油的路人……好心人都爱笑，明艳的灿烂的笑，看着让别人舒心，笑的人自己也快乐。另一种人，则总是黑丧着脸，斤斤计较。这个世界需要更多的正能量，这一种人的事情就不必说出来了。 大队的家文化。从宝鸡出来，霞姐爆胎了换车后发现工具不足，那天我是后骑，随技术员补胎追队，万不得已找到一家加油站求助，补完胎出发后又遇到一些小情况，大队已经走远。那一天已经做好了追队追一整个下午的心理准备，没想到追了两个小时后一转角就听到一片欢呼，大队就在那休息等人。追上大队真有一种到家的感觉，生理上可以放轻松点，心理上更是欣慰，大队里骑行有歌声，有笑话，有温暖。在临潭打前站，我去山脚下迎接大队，眼看着队伍从山上的一列小黑点慢慢靠近，看见大队靠近就像看见亲人一样，大队看到前站也是一片欣悦。 路上的艰难。 夜骑，进入文峰镇那天骑了150多公里，不得已大队夜骑。虽然很饿很累，但是全队一路上放声高歌。 雨骑，入夏河县的晚上，最后一公里的烂路，下着雨，女生坐车前往住处，男生先把自己的车骑过那一段烂路抵达住处，又返回把女生的车骑回来，回到住处发现女孩子们早已准备好一杯杯热的板蓝根； 原计划去倒淌河镇那天，远征路上最艰难一天，大风大雨，寒风凛冽，全身湿透。最后15公里的大长坡一路放声高歌硬是爬了上去，在坡顶，男生把仅剩的一点火腿和热水让给女生，女孩子围成一团默默哭泣，男生围在外圈给女孩子抱团挡风取暖，放声高歌，天地怆然，路旁的经幡在雨中凄惨地低着头。紧接着十多公里的冰冷大下坡之后，在一个废弃的加油站休息，都冷得浑身直哆嗦。女生在一个面店里休息暖手，技术员抓紧检查每一辆车的刹车，刹车块已经磨出了一大团泥浆。都进屋之后，只有默默的问候，没有任何人说一句苦，默默的把几碗热面条大家一起吃完…… 环湖第一天，下着大雨，大风呼啸，亮亮爆了胎，换车后我与技术员追队时又爆了，风阻很大，全身湿透，冲锋衣的皱折上都积满了一汪汪的雨水，为了追上大队，速度不能放缓，雨水打在骑行镜上，视野一片模糊，风雨声呼啸，张大嘴巴全力呼吸海拔3200那一点稀薄的空气，雨水泥浆扑在脸上扑进喉咙令人窒息。 追上大队后继续前行，雨势变得更大，步履维艰。这时候队里又开始唱歌，转进草原上一处爱心安置点暂作休整，女生们都进了面积不大的安置点躲雨，男生在外面放声唱《水手》。同行环湖的别的骑友默默看着我们，默默放弃骑行把车扛上了汽车…… 说是远征路上的辛苦，其实是乐观和感动。 黑马河乡，淋了三天雨不能洗澡，早上牵车出发时突然看到了绚丽的朝霞。一点点美都能让人无比感动。 远征过去了，属于远征队的默契总会留下。多少年后我们总会记起那段晨光熹微时就牵车出发，傍晚时分到达一个个素昧平生的小城镇的日子。大山，大河，大坡，大草原，伴随着“靠左”，“靠右”，“减速”的口号声和嘹亮的歌声渐行渐远。 流逝的是时光，留下的是感觉。]]></content>
+      <categories>
+        <category>骑迹</category>
+      </categories>
+      <tags>
+        <tag>骑行</tag>
+        <tag>远征</tag>
+        <tag>成都</tag>
+        <tag>西安</tag>
+        <tag>青海湖</tag>
+        <tag>高原</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[远方]]></title>
+    <url>%2F%E8%BF%9C%E6%96%B9.html</url>
+    <content type="text"><![CDATA[感悟 北国的春天，桃红柳绿，清爽宜人，温度刚刚好，太阳暖融融的。而此时的南方，其实正是一年之中最难受的时候，万家烟雨，愁云密布，空气潮湿。衣服被褥无不沾染上水汽，地板瓷砖湿淋淋的衣服晾不干。从前怎么也想不到三四月份可以这么舒服。 父亲一直不满意我来到这离家万里的地方。在他的理想中，我是个中规中矩的医生，顺利地加入神圣的中国共产党，在家乡附近求学，在梧州的一家医院里工作，娶个附近的女孩子成家，不要去远方，不要被居心叵测的社会上的人坑骗……甚至于寒假期间我找了一份推销手机的兼职，他都郁闷不已。 父亲是一名勤勤恳恳的农民工，和中国千千万万的农民工一样，兢兢业业小心翼翼地劳作，生活，朴实得就像他们耕耘了一辈子的黄土地，双手布满了岁月的沟壑，洗也洗不掉。 可是这一双手硬是在长洲的黄土里拉扯出一家的基本饱暖，在肆虐狂吼的决堤洪水中抢过妻儿的生命，一砖一瓦一担担泥土垒起一间房子，转入城市，又在车水马龙的街道上，日晒雨淋一步步走出城里生活的温饱还能让子女受教育。 有一次听到一位乡亲说，唉呀都是同一辈的人，眼光就是不同，他们家在那个时代那个境遇让孩子做工帮补家里，而父亲无论多困难都让子女上学，眼看着都上大学了，苦日子快熬到头咯！他的话语中不无赞赏，我听着一阵心酸。母亲每每说到，农村里的孩子像你这么大已经要帮家里种田卖菜了…我帮过什么？五年级时替母亲给人家扫扫单元楼，初中时帮着摆摆地摊…仅此而已，假期里帮着扁担挑点货物肩膀都硌得咬牙切齿忍着忍着不让父亲看到，拉锯锯一点点木柴嘴上虽说还好却已经累得腰酸背痛，相比父亲，我弱爆了。 是的，我敬佩父亲，尽管某些时候他的想法多么令人难以理解。小时候父母却不愿意买课外书，在他们的心目中，课外书的钱花出去了就回不来了，不值得——看到想看的书，我只好站在书店，一整个下午地看。 路遥的笔下，一茬茬的青年无不从独立开始变成男子汉，无论是幸福还是苦难，无论是光荣还是屈辱，让自己来遭遇和承受，只有年轻的血液才会如此沸腾和激荡。 父亲，我该怎么向你解释列车跨过长江时心中奔涌的热情，哦！这就是长江！我该怎么向你描述行走在一望无际的华北平原时那种震慑到灵魂深处的壮阔雄浑，我该怎么让你明白，一脚迈出火车已然万里之遥心中翻腾的感慨，是否每个人的青春都有一场远行的梦？ 我爱骑行，深爱骑在自行车上那种无比宁静的心情，无拘无束。寒假的打工生涯终于让我凑够钱凭借自己的努力骑上一辆差强人意的车——只要不花家里的钱买车，我就心安理得。一次说走就走的黄河之行，让我知道人力可以走多远，骑上山顶看绚丽的晚霞，激动得快要大喊大叫… 读书的真谛，无非是在看过的大量书本中找到一二，与自己的经历和思想达到共鸣产生共振，给生命赋予新的思考; 经历的意义，或许也是在不同的从未尝试过的新鲜事物中找到自己最热爱却从未发现的事情，从此乐此不疲。没骑过车走远一点，我从不知道自己会这么喜欢骑行，就像没来过下雪的北国，我就不会知道春天可以不潮湿。 父亲总喜欢给我理发，自己理发能省点钱。每次理发父亲总是像匠人一样精雕细琢，我走远了，只好回家之前留个长点的头发，返校之前头发多短也让他象征地摆弄摆弄，在这边，去理发我从不苛求样式，只要够便宜，只要剪短就行了，只要能达到父亲的水平。空巢老人，父亲因此成为了这个群体的一员。树欲静而风不止，子欲养而亲不待，这句话每每让我倍感任重道远。父亲老了…青年时代打拼出个家庭的真汉子，如今快到古稀之年，脸上的皱纹让他看起来总是愁容满面——或许是真的愁。黯淡的灯光，单薄的衣裳，蜷缩着盯着灶膛里跃动了几十年的柴火，身后收音机沙哑地咿呀着那支从我的童年唱到现在的歌… 父亲，我走远了…]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>社会</tag>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[生活的味道]]></title>
+    <url>%2F%E7%94%9F%E6%B4%BB%E7%9A%84%E5%91%B3%E9%81%93.html</url>
+    <content type="text"><![CDATA[感悟 2014年的寒假，作为一名大学生可谓无忧无虑了，尽情去体验社会与生活的滋味吧。 春运，举国性质的人口大迁徙，在南方有着这么一群人，家乡在西部的小村镇，全年都在大城市打工，年关时节，带着一年的风霜赶回家团圆过年。这一条路线，横亘在广东与广西之间，三四百公里的路程，而他们选择的交通工具——摩托车。这就形成了摩托车返乡大军的队列。年年春节将至，滚滚铁骑轰鸣在国道之上，车毁人亡，乐极生悲的人间悲剧，每年都有发生。 这一年，作为志愿者我有幸接触到这么一群人。 风尘仆仆的司机大哥，一身裹得严严实实驱车前来，身后一个女人背着裹在厚衣服里面的孩子，后座上五花大绑着各种物资，看得出有些是买给家里稍大点的孩子的礼物。摩托车开进服务站，男人脱下厚重的手套，露出满是黑色沟道的手掌，洁白的纸杯捧在他手上显出一种极不协调的娇嫩，尽管戴着厚手套，可是他的手像生铁那样坚硬，粗糙，冰凉。 闲谈中了解到，男人在顺德打工，每年驱车回家过年，此前已经开了四个小时的摩托车，双眼布满血丝。开过摩托，我知道在寒风中连续驱车的感觉，脸庞被头盔包裹住，发动机的轰鸣因为熟悉，麻木而已经再也听不见了，仿佛整个宇宙只剩下自己的呼吸声。同时我也知道，对于这些奔波一年的劳动者来说，这点路途的艰辛，又能算得了什么呢？什么春运服务站，与他们而言只不过是个可有可无的歇脚点罢了。 想起一则听说的新闻，家里的留守儿童不舍得父亲出去打工，偷偷拿钱外出寻父，走失在大城市里。年轻人往外走，在大城市里谋生，留守儿童，空巢老人…城乡二元体制带来一个个的社会问题。若不是生活的压迫，谁愿意背井离乡，在灯火迷离的都市里流血流汗呢？ 而生活的天平从未因为人们的命运悲惨而倾斜过。 年后打工， 早出晚归，柜台前站一天，晚上回到家已经几近午夜，匆匆吃点东西洗澡洗衣，躺倒就睡着了。作为推销，入行不久，压力颇大。好一阵子之后，才逐渐摸出了门道。晚上回家时，街上已经人烟稀少，凛冽的寒风割在脸上，就像生活的滋味一般，真切，真实。 此间帮忙在步行街摆摊做手抓饼卖，重回地摊江湖的世界。江湖上的行规行矩令人感到新奇而又惊讶。夜幕低垂的时候，霓虹闪烁，商场里的音乐声缭绕在街上，湿湿的小雨打在脸上，熙熙攘攘人声鼎沸，突然觉得这个世界那么可亲可爱。地摊客有着各种各样的来历，各种各样的性格。某天市里某位权贵路过步行街，声势浩大，摊贩顿时乱成一团…真是个有意思的事件。 开摩托，爬梯子，修烟囱，修电线……柴米油盐的生活琐事和太阳一样每天出现，年前年后也就两个阶段，寒假竟然就这么过完了！拉上行李走出家门，一天一夜脚步已然踏在万里之遥。昨天家里一岁多的小侄女在小院里到处乱跑，她外婆端着饭碗边追边喊的情景还历历在目！忙，连母校都来不及回去看上一眼…… 这么的又回到了一个多月以前的样子，该收心学习了，不见棺材不掉泪，心有余悸啊…… 多读书，我读的书还太少，饥不择食的状态，饥饿的人怎能挑选食物呢？ 多经事……下了火车，有点怅然若失，感觉生活中少了点什么……该找些其他的精神支柱吧]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>社会</tag>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[十月大，行云流水]]></title>
+    <url>%2F%E5%8D%81%E6%9C%88%E5%A4%A7%EF%BC%8C%E8%A1%8C%E4%BA%91%E6%B5%81%E6%B0%B4.html</url>
+    <content type="text"><![CDATA[感悟 这一个月，许许多多的第一次，一种行云流水的感觉。 从一次骑行说起。想好了跟洪家楼校区的同学骑车去黄河，结果发现洪楼早上7点出发，山里过去太早没车坐。好吧，咬咬牙骑车过去，说好了周五跟车队去洪楼借车熟悉一遍路线，结果一场雨冲了计划。瞬间变成了一次充满未知的骑行，第一次骑行这未知的路线，未知的路况，未知的事情…还去不去？ 一句话，想去做的事，什么也不能阻止…问人借齐了装备，清晨5点，跨上车骑行离开静谧的校园走向二环东路，偌大宽阔的马路宁静安详，清晨的冷风和雾气，风在耳边，路在脚下。突然就爱上了这种感觉，曾经重重顾虑瞻前顾后，真的走上路来发现其实不错，想起来很挑战的事，会有千千万万个借口能让你畏缩不前，但是走下去，只要一个理由就够了——心向往之。 只要向往， 一切疑虑，顾忌，畏惧，怯懦瞬间灰飞烟灭。 人生有很多不想做的事情却不得不做，但是有些想做的事情，就不要畏缩不要迟疑。辩论赛来了，其实从不敢想象自己第一次穿上正装在辩论台上能说话，第一场不知所措，第二场不知所云，找几个早上在小树林找棵树说话，第一遍说的自己都听不下去了，无论什么事，试过就好点了，第三场，感觉比前两场就好了。院会外联的路演，以及后来的金立音乐节。一种感觉就是，站在组织人员的角度要考虑很多，金立音乐节晚会，第一次参与组织工作，长见识了……很多这样的第一次都是一个念头闪动去参与而得来的，听到一个讲师的演说， 一念之差结果截然不同，要不要做，只是一瞬间的一个想法。人生是人生经历的总和，把经历丰富起来，把人生丰富起来。修短随化，终期于尽，人生是一个圈，周而复始，不同的是深度与厚度，圈里的内容有多少。黄巢拉练，聚是一团火，散是满天星，那个有流星有篝火的晚上，回想起来都令人感动。真的很幸运大学四年里能有这么一天半，和一群人骑车去一个远离市区的地方，吃一顿寒风中的晚餐，烧起一团篝火看一场晚会，看圆月和星空，居然还看见了流星，睡一晚大通铺，过一天苦日子。 路上一个天梯一样的大坡，车队为之惊呼。走到坡下，其实并没有那么可怕，人在坡上，那只是一段难走一点的路，爬上坡顶，那只是一生中的一小片浪花罢了。 车队的传统令人眼前一亮，优待女生，爬坡时帮女生背包，推人，吃饭时等齐所有人再一起开吃…还有黄河鹊山拉练过程中的餐后清盘，节省餐具…有些事情只有做过才会懂得，有些风景只有单车能够体会。 这个月听了两场精彩的讲座，一位老师从校园走出去创业，一位老师在世界200强经历一番风雨后又回到校园。人生的深度与厚度是从经历里提炼出来的，见过场面的人说的话，听着听着就有一种都付笑谈中的感觉。睿智，幽默，风趣，闪光的想法和经历被他们如数家珍的娓娓道来。想到几十年后的我会是怎么样呢？大学四年，可以说是大范围的学习吧，眼光放开，束缚解开，框架打破。知道自己要什么，不为别人而活着。 单片机应用设计大赛。熬了夜，欠了早餐，淋了雨…疯狂的机会，用一次就少一次了么？结果不重要了，也算见识到了大神级别的作品。 这个月很忙，很忙乱。话说多了，事做多了，然而静下来思考就少了，书读少了，变肤浅了。几天前一个晚上补了个晚餐从超市走出来，浓重的PM2.5朦胧了月，形成一种诡异的美感，突然觉得一阵感动。这些天有没有丢失了自我？日程满满，这不能是持续的生活方式。 找个时间静一静，调整调整。]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>生活</tag>
+        <tag>我的大学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[斑斓九月]]></title>
+    <url>%2F%E6%96%91%E6%96%93%E4%B9%9D%E6%9C%88.html</url>
+    <content type="text"><![CDATA[感悟 是该写点什么了 9月初，登上北上的列车，行李加上台式电脑自己扛着，吭哧吭哧搬来济南。广州站见证，不要风度只要安好是什么感觉。 20多个小时的火车， 沿途一座座城往后退去，万里之遥，手机没有信号，手边没有消遣。同一节车厢的不同经历的人便攀谈起来，开学季，车里多是学生，举手投足尽是透着读书人的斯文，各种看法想法相互碰撞，一天一夜，路实在漫长。这情景，竟像是余秋雨笔下的夜航船。 夜21点，磕磕碰碰把大块行李扛出火车，脚踏这一片从未涉足的土地，这一座城，将是4年乃至更长久的守候啊！风风火火赶到宿舍，囫囵囫囵铺上被褥，23点，第一夜睡得真是舒服——火车上太累了。 马上开始军训。 粗犷豪迈的军训生活，容不得半点矫揉造作。生活被绷紧了，只因为心中对权威的敬畏。不知后军训时代，这样的严于律己还能剩下几分。过中秋，军训汇报表演，开始上课，国庆来了…… 有那么几个耐人寻味的瞬间 火车开动，离开广州站。从未走出过两广，而今就离开温润的南国。开始想未来。山大的影响力在北方，电信行业的舞台在南方。无论是偶然还是必然，尽人事，听天命吧。 军训结束，与十佳方阵失之交臂，男默女泪。时过境迁，说来轻巧，唯有一起走过，才知道这份回忆的厚重。端腿？军姿？摆臂？没有一样是让人回味的，心里挂念的只是这段时间，只是一起走过。多苦多累都是一同经历的，多欢乐多感动也是一起感受着。时间不紧不慢的行走，却不知觉中瞬间走完半月多。结果并不重要，感人至深的是天天喊着累站着队盼着小休息的机会熬过这半月多，猛一回头才发现这可爱的日子是一去不返了，一同追求着一个目标，单纯而充实。结果公布，一同经历过的人才能体会艰辛的滋味。好吧这一切都已经归于过往，那种喉头哽咽的感觉可能再也回不来了，只是希望这个过程能给彼此留下点什么。 军训下午5点多，小休息看夕阳暖暖的铺洒着操场，夜训的晚风，狂放的拉歌，真美！ 济南是一座挺有意思的城市，市中心找不到锋芒毕露，高耸如云的写字楼，济南就是这么朴实，还保留着上个世纪风格的大楼，还为电车保留了纵横交错的电车供电线，不像深圳，棱角分明的写字楼透着杀气，不像广州，拥挤不堪的街市透着压力。泉城广场人声鼎沸，走出去一排柳树背后竟似另一番天地，泉城路，芙蓉街，茂盛的法国梧桐和柳树让最为热闹繁华的地方也留有几分安详。信步走入曲水亭街，终于找到徐霞客笔下“家家泉水，户户垂杨”的景象，像是另一个江南水乡，老屋老墙老巷，竟与童年时的四坊后路又有几分相似。商业街和特色民居相隔如此接近，又融合的如此天衣无缝。 大学生活真的就开始了 从社团开始。参加了多场社团的面试，各种压力面试，无领导小组讨论…多场见面会，领略多个社团不同的风格和社团文化，遇见天南海北各有特色才华横溢的精英们。大学是一个更高的平台，从遇见让我眼前一亮，无比钦佩的人们开始。在这样的人当中，找到一起往前走的感觉，找到心底的共同语言。而我自己，站到了一定的平台上，却还是青涩，性子中有着不少的缺点，很多人都值得我钦佩不已，此后定期的记录中该多反省，改变自己。路漫漫其修远兮… 记录一些瞬间惊艳的只言片语： 社会需要三种人，有钱的人，有背景的人，和能办事的人。社会水分再多，总要有人办实事。语出英语老师，这是一个阳光幸福的人，他是否阳光不在于他的处境和地位，一个人的阳光自信全都写在眼睛和言语中，弱者嚎叫社会不公，强者默默前行，没有时间发牢骚。小树林里透着一种知识分子的气息，无论学什么学科，都应该带有人文的闪光，带有读书人的味道。出自学长赵惠令，各个领域的巅峰人物，走到顶端无论是行业之间有多大区别，有些看法想法总是共通的，殊途同归，这就是人文气息。当你面对太多选择感到迷茫的时候，都走走，这会很累，但是只有这么累过，才会有更清晰的视野。山东大学学生会副主席。大学四年，做你想做的事，做你想改变的事。来自一位我很钦佩的学长，山东大学学生会社会实践部部长。…… 一个月以来，风风火火的场面遇到过，慵懒懈怠的时候也有过。人的发展提升是逼出来的，费点力气硬着头皮厚着脸皮才能爬到更高的台阶，毫不费力只能在平地徘徊。 开始吧！]]></content>
+      <categories>
+        <category>生活感悟</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>生活</tag>
+        <tag>我的大学</tag>
+      </tags>
+  </entry>
+</search>

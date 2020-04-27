@@ -1,0 +1,11 @@
+# hexo robots.txt
+User-agent: *
+Disallow: /lib/
+Disallow: /js/
+Disallow: /css/
+Disallow: /books/
+Disallow: /movies/
+Disallow: /Resume/
+Disallow: /fonts/
+Sitemap: https://www.hsli.top/sitemap.xml
+Sitemap: https://www.hsli.top/baidusitemap.xml
