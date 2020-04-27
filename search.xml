@@ -90,9 +90,9 @@
     <content type="text"><![CDATA[手头有个古老的数据库来的数据源，用的是US7ASCII编码，现有的库是ZHS16GBK编码，需要在CentOS搭建的ETL服务器上完成数据导入，来自https://www.hsli.top 尝试了各种方法，主要记录如下： SSH中乱码对于Windows，需要设置环境变量NLS_LANG与数据库服务器中通过下列语句查询结果一样的编码方式 12345SQL&gt; select userenv(&apos;language&apos;) from dual;USERENV(&apos;LANGUAGE&apos;)----------------------------------------------------AMERICAN_AMERICA.ZHS16GBK 对于Linux，需要在环境变量中加入NLS_LANG参数 1vim /etc/profile 加入 1export NLS_LANG=&apos;AMERICAN_AMERICA.ZHS16GBK&apos; 并且，所用的SSH终端记得选择相应的编码方式 Kettle预览乱码Windows中通过勾选允许建议转换就可以了 Linux中就麻烦了，摸索了好久才发现 打开spoon.sh，找到JVM的启动参数段 123OPT=&quot;$OPT $PENTAHO_DI_JAVA_OPTIONS-Dfile.encoding=GBK-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -Djava.library.path=$LIBPATH -DKETTLE_HOME=$KETTLE_HOME -DKETTLE_REPOSITORY=$KETTLE_REPOSITORY -DKETTLE_USER=$KETTLE_USER -DKETTLE_PASSWORD=$KETTLE_PASSWORD -DKETTLE_PLUGIN_PACKAGES=$KETTLE_PLUGIN_PACKAGES -DKETTLE_LOG_SIZE_LIMIT=$KETTLE_LOG_SIZE_LIMIT -DKETTLE_JNDI_ROOT=$KETTLE_JNDI_ROOT&quot; 加入-Dfile.encoding=GBK参数 Kettle多表转换中批量选择允许建议转换由于Kettle有多表复制功能，自动生成各个表的转换流程，但是默认不勾选允许建议转换，此时可以用Notepad++打开所有由Kettle生成的ktr文件，查找替换&lt;lazy_conversion_active&gt;Y&lt;/lazy_conversion_active&gt;，当然是将N换成Y了 不同字符的存储长度问题中文字符集会占用更多的存储空间，一些本来足够长的varchar2字段换了字符集就不够长了 怎么办呢，我先用PL/SQL把数据库的结构导出为SQL脚本，然后将所有varchar2字段长度加长，比如说乘上3就好了 至于怎么处理这个SQL脚本，就有意思了 我写了个Python，把所有的varchar2长度都乘了3，再把这个sql脚本用PL/SQL生成数据库表结构，再用Kettle导入，就好了 Python脚本如下 1234567891011121314151617181920212223242526272829303132#coding:utf-8# private02数据库编码有些问题，转换编码之后，原来的字段长度又不够放下新的编码内容了，写了个脚本，把数据库生成脚本的所有相关字段长度都乘上3import refile = open("G:\\Inspur\\PowerDesigner\\BusinessData\\private02.sql",)pattern1 = re.compile(r'(^\s+.*?VARCHAR2\()(\d+)(\).*)')pattern2 = re.compile(r'(^\s+\S+\s+CHAR\()(\d+)(\).*)')while 1: line = file.readline() if not line: break if re.match(pattern1,line): items = re.findall(pattern1,line) updated_num = int(items[0][1])*3 updated_num = 4000 if updated_num&gt;4000 else updated_num print items[0][0],str(updated_num),items[0][2] elif re.match(pattern2,line): items = re.findall(pattern2,line) updated_num = int(items[0][1]) * 3 print items[0][0],str(updated_num),items[0][2] else: print linefile.close()]]></content>
       <tags>
         <tag>CentOS</tag>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
         <tag>编码</tag>
+        <tag>Oracle</tag>
       </tags>
   </entry>
   <entry>
@@ -100,8 +100,8 @@
     <url>%2FOracle%E5%B8%B8%E7%94%A8%E6%A6%82%E5%BF%B5%E5%8F%8A%E5%91%BD%E4%BB%A4.html</url>
     <content type="text"><![CDATA[由于有新数据需要入库和处理，现在需要来一波Oracle命令。之前刚刚入门，也不懂技术，现在稍微懂一点了，备份一下一些常用命令，以后再用到就不用再到处百度谷歌了，来自https://www.hsli.top 用户创建用户identified by *** ，用户的密码。 default tablespace *** 默认用户表空间。 temporary tablespace *** 默认临时空间。 123create user test identified by testdefault tablespace tsusertesttemporary tablespace tstemptest; 修改密码：12alter user testidentified by test; 删除用户以及跟用户关联的对象：1drop user test CASCADE; 授权Oralce的特殊权限 系统权限unlimited tablespace是隐含在dba, resource角色中的一个系统权限. 当用户得到dba或resource的角色时, unlimited tablespace系统权限也隐式受权给用户. 系统权限unlimited tablespace不能被授予role, 可以被授予用户. 系统权限unlimited tablespace不会随着resource, dba被授予role而授予给用户. 特殊角色 DBA角色，是授权数据库管理员的权限 CONNECT角色， 是授予最终用户的典型权利，最基本的 一个（CREATE SESSION） RESOURCE角色，是授予开发人员的 默认有八个权限（CREATE SEQUENCE,CREATE TRIGGER,CREATE CLUSTER,CREATE PROCEDURE,CREATE TYPE,CREATE OPERATOR,CREATE TABLE,CREATE INDEXTYPE） exp_full_database角色，拥有导出数据库的权限 imp_full_database角色，拥有导入数据库的权限 授权命令 1grant resource to test; 123grant select on username.tablename to user;grant create view to user;grant create table to user; 查询权限以下的查询中，基本都要以DBA的角色进行查询，如果权限不够，有可能查询不出来数据。 查看用户拥有那些角色 1select * from dba_role_privs a where a.grantee=&apos;test&apos;; 或 1select * from dba_sys_privs a where a.grantee=&apos;test&apos;; 查看角色拥有那些权限 1select ROLE, PRIVILEGE from role_sys_privs where role=&apos;RESOURCE&apos;; --RESOURCE，CONNECT，DBA 或 1select grantee,privilege from dba_sys_privs where grantee=&apos;RESOURCE&apos;; 收回角色 12revoke resource from test;revoke select username.tablename from user; 收回权限 1revoke unlimited tablespace from test; 查看Oracle的版本号 1select * from v$version where rownum &lt;=1; 表空间创建表空间创建 1create tablespace private_db datafile &apos;/export/DataBase/data/private_db01.dbf&apos; size 1G;&apos; 创建大文件表空间 1create bigfile tablespace private_db datafile &apos;/export/DataBase/data/private_db.dbf&apos; size 2G; 分配给用户 1alter user private_db default tablespace private_db; 修改数据文件大小 1alter database datafile &apos;/export/DataBase/data/private_db01.dbf&apos; resize 2G; 由于涉及IO，每弄一次数据文件都超级慢啊！！！ 可以自动扩展 删除表空间，数据对象和OS文件 1drop tablespace private_db including contents and datafiles; 设置数据文件自动扩展 1alter database datafile &apos;/export/DataBase/data/private_db01.dbf&apos; autoextend on next 200M maxsize unlimited; 对于大文件表空间，只有一个数据文件，也可以设置表空间自动扩张来设置数据文件自动扩展 1alter tablespace private_db autoextend on next 500M maxsize unlimited; 查询表空间 查看当前用户的缺省表空间 1SQL&gt;select username,default_tablespace from user_users; 查看当前用户的角色 1SQL&gt;select * from user_role_privs; 查看当前用户的系统权限和表级权限 12SQL&gt;select * from user_sys_privs;SQL&gt;select * from user_tab_privs; 查看用户下所有的表 1SQL&gt;select * from user_tables; 修改表空间存储路径（Oracle中数据文件是按照表空间来区分的） 查看数据文件的存储路径： 1234567SQL&gt; select name from v$datafile;NAME--------------------------------------------------------------------------------/u01/oracle/oradata/yoon/system01.dbf/u01/oracle/oradata/yoon/sysaux01.dbf/u01/oracle/oradata/yoon/undotbs01.dbf/u01/oracle/oradata/yoon/users01.dbf 修改表空间为offline： 12SQL&gt; alter tablespace users offline;Tablespace altered. 拷贝数据文件 1$ cp users01.dbf /u01/oracle/oradata/yoondata/ 修改表空间存储路径 12SQL&gt; alter tablespace users rename datafile &apos;/u01/oracle/oradata/yoon/users01.dbf&apos; to &apos;/u01/oracle/oradata/yoondata/users01.dbf&apos;;Tablespace altered. 修改表空间为online 12SQL&gt; alter tablespace users online;Tablespace altered. 重新查看数据文件路径 1234567SQL&gt; select name from v$datafile;NAME--------------------------------------------------------------------------------/u01/oracle/oradata/yoon/system01.dbf/u01/oracle/oradata/yoon/sysaux01.dbf/u01/oracle/oradata/yoon/undotbs01.dbf/u01/oracle/oradata/yoondata/users01.dbf 表 查看用户下所有的表 1SQL&gt;select * from user_tables; 查看名称包含log字符的表 1SQL&gt;select object_name,object_id from user_objects where instr(object_name,&apos;LOG&apos;)&gt;0; 查看某表的创建时间 1SQL&gt;select object_name,created from user_objects where object_name=upper(&apos;&amp;table_name&apos;); 查看某表的大小 1SQL&gt;select sum(bytes)/(1024*1024) as &quot;size(M)&quot; from user_segments where segment_name=upper(&apos;&amp;table_name&apos;); Drop掉的表恢复 今天一不小心把库里一个500W数据量的表drop掉了，吓得半死，上网一查，有方法恢复的 查看回收站 123SQL&gt;show recyclebin;ORIGINAL NAME RECYCLEBIN NAME OBJECT TYPE DROP TIMETEST_DROP BIN$b+XkkO1RS5K10uKo9BfmuA==$0 TABLE 2005-05-07:14:30:47 恢复 1SQL&gt;flashback table test_drop to before drop 锁 用dba权限的用户查看数据库都有哪些锁 1select t2.username,t2.sid,t2.serial#,t2.logon_time from v$locked_object t1,v$session t2 where t1.session_id=t2.sid order by t2.logon_time; 根据sid查看具体的sql语句，如果sql不重要，可以kill 1select sql_text from v$session a,v$sqltext_with_newlines b where DECODE(a.sql_hash_value, 0, prev_hash_value, sql_hash_value)=b.hash_value and a.sid=&amp;sid order by piece; 输入SID即可查询 kill该事务 1alter system kill session &apos;339,13545&apos;; 视图创建视图 123456create or replace view nsrxx_limited asselect &quot;NSRMC&quot;,&quot;NSRZT_DM&quot;,&quot;PROVINCE&quot; from (select nsrmc,nsrzt_dm,&apos;河南&apos; as province from DJ_NSRXX t1union allselect nsrmc,nsrzt_dm,&apos;四川&apos; as province from DJ_NSRXX_LS_SICHUAN t2);]]></content>
       <tags>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
       </tags>
   </entry>
   <entry>
@@ -133,8 +133,8 @@
       <tags>
         <tag>CentOS</tag>
         <tag>Linux</tag>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
       </tags>
   </entry>
   <entry>
@@ -142,8 +142,8 @@
     <url>%2FPowerDesigner%E5%BF%AB%E9%80%9F%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93.html</url>
     <content type="text"><![CDATA[利用PowerDesigner可以快速创建数据库表结构，把关注点放在表和模型的架构上而不是SQL语句上，由于用PowerDesigner创建数据库结构的文章网上不一而足，本文主要讲一些重要概念和主要步骤，来自https://www.hsli.top 创建过程打开Powerdesigner，file-&gt;new&gt;Physical Date创建物理模型 打开后右边Toolbox中用Table工具创建表， 建好一个表之后，双击打开在Column中添加字段，Name处填写字段名，可以为中文，Code里面是字段代码，只能是英文，后面可以勾选P定为主键。 两张表之间如果有引用关系，可以用右侧Reference工具从子表拖往主表，即可创建连接关系，这些都很简单 一些概念主键一个表中用来区分唯一记录的字段，主键必须唯一而且非空，不然就没法区分2条记录了 外键代表从属关系，外键可以为空，外键如果有值一定要在其引用表中能找到相应记录，他要么不贴标签（外键为空），一旦贴上标签一定要注明是谁的（有响应主表记录），当然外键也可以重复（一个主可以有多个从属） 生成SQL脚本表结构创建完成之后可以生成SQL脚本来创建数据库，其实打开脚本来看的话，里面无非就是创建表，创建约束关系的SQL语句。 点击Database-&gt;Database Generation选择目录，起个名字生成SQL脚本。 如果引用关系很复杂的话，可能会导致生成过程报错，这是因为表名太长，导致一些键约束关系重名，可以右键选择错误，然后自动修复即可 创建完成后，可以将SQL脚本上传到数据库服务器用sqlplus执行@脚本名来执行里面的SQL语句创建数据库，也可以复制粘贴到PL\SQL中执行 细节表名称自动添加到注释新建表之后可以用中文为表命名，但是生成的SQL语句中当然是以英文的Code来命名数据表，这就导致了有注释意义的中文表名丢失，可以用如下脚本将表名添加到表注释里，在Powerdesigner用快捷键Ctrl+Shift+X可以打开脚本执行窗口，粘贴如下脚本代码即可 123456789101112131415161718192021222324252627282930313233343536373839404142434445Option ExplicitValidationMode = TrueInteractiveMode = im_BatchDim mdl ' the current model' get the current active modelSet mdl = ActiveModelIf (mdl Is Nothing) Then MsgBox "There is no current Model "ElseIf Not mdl.IsKindOf(PdPDM.cls_Model) Then MsgBox "The current model is not an Physical Data model. "Else ProcessFolder mdlEnd If' This routine copy name into comment for each table, each column and each view' of the current folderPrivate sub ProcessFolder(folder) Dim Tab 'running table for each Tab in folder.tables if not tab.isShortcut then tab.comment = tab.name Dim col ' running column for each col in tab.columns col.comment= col.name next end if next Dim view 'running view for each view in folder.Views if not view.isShortcut then view.comment = view.name end if next ' go into the sub-packages Dim f ' running folder For Each f In folder.Packages if not f.IsShortcut then ProcessFolder f end if Nextend sub]]></content>
       <tags>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
         <tag>Power Designer</tag>
       </tags>
   </entry>
@@ -152,8 +152,8 @@
     <url>%2F%E6%B8%85%E9%99%A4%E5%92%8C%E7%A6%81%E7%94%A8archibelog%E8%A7%A3%E5%86%B3ORA-00257.html</url>
     <content type="text"><![CDATA[昨晚导了一晚上的数据，满以为一觉醒来就导完了，结果早上来到公司一看，Kettle卡住了，现在解决一下这个问题, 来自https://www.hsli.top PL\SQL也连不上了，提示ORA-00257:archiver error，一查，原来是Archivelog满了。。。。 查看archivelog方法： 123SQL&gt; set linesize 300SQL&gt; set pagesize 30SQL&gt; select * from V$FLASH_RECOVERY_AREA_USAGE; 去到/opt/oracle/flash_recovery_area/实例名/archivelog目录下一看，我滴乖乖，从数据库创建之日起，一直记录到昨晚，昨晚导好几百万条数据，难怪满了。 由于之前的记录都是导数据过程中的瞎折腾，没什么意义，就直接删掉了都。 然后RMAN更新一下，以oracle用户身份登录 1234567$ rman target / //如有多个实例此时执行rman target 用户名/密码@实例名RMAN&gt; list archivelog all; //列出所有的归档日志文件RMAN&gt; crosscheck archivelog all; //与物理归档日志文件保持同步，之前移走了一部分文件，因此执行此命令后会在/oracle目录下找不到的归档日志标记为expiredRMAN&gt; list expired archivelog all; //列出所有expired（过期）的归档日志文件，此时你就可看到移走的归档日志文件均被标记为expiredRMAN&gt; delete expired archivelog all; //在oracle中删除所有过期的expired文件RMAN&gt; list archivelog all; //再列出所有的归档日志文件，就可发现移走的日志文件被删掉了RMAN&gt; exit //退出 由于在导入数据过程中暂时不需要备份，所以关掉归档模式，导完之后一定要记得重新打开。先以sysdba身份登录数据库，关归档模式命令如下： 关库 1234SQL&gt; shutdown immediate;Database closed.Database dismounted.ORACLE instance shut down. mount数据库 123456789SQL&gt; startup mount;ORACLE instance started.Total System Global Area 3423965184 bytesFixed Size 2180544 bytesVariable Size 2013268544 bytesDatabase Buffers 1392508928 bytesRedo Buffers 16007168 bytesDatabase mounted. 关闭归档模式 12345678910SQL&gt; alter database noarchivelog; // 打开归档用这个alter database archivelogDatabase altered.SQL&gt; archive log list;Database log mode No Archive ModeAutomatic archival DisabledArchive destination USE_DB_RECOVERY_FILE_DESTOldest online log sequence 228Current log sequence 230 启动数据库 12SQL&gt; alter database open;Database altered.]]></content>
       <tags>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
         <tag>日志</tag>
       </tags>
   </entry>
@@ -163,8 +163,8 @@
     <content type="text"><![CDATA[准备导数据了，可是试了一下，在服务器上加一条中文条目，客户端显示乱码，老扎心了，来自https://www.hsli.top 有下列几个地方需要设置得一致 1SQL&gt; select userenv(&apos;language&apos;) from dual; Oracle用户目录下的.bash_profile里面有一行1export NLS_LANG=`AMERICAN_AMERICA.ZHS16GBK` 没有的话自己加上 本地Oracle client的注册表项regedit -&gt;HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ORACLE\KEY_OraClient12Home1_32bit-&gt;NLS_LANG 以及本地环境变量NLS_LANG 别的都好该，唯独第一个地方最不好改了，下面的方法来改： 12345678910111213SQL&gt; shutdown immediateSQL&gt; startup mountSQL&gt; alter system enable restricted session;SQL&gt; alter system set job_queue_processes=0;SQL&gt; alter system set aq_tm_processes=0;SQL&gt; alter database open;SQL&gt; alter database character set zhs16gbk; 这里会报错，不用管 1SQL&gt; alter database character set internal_use zhs16gbk; 查看一下搞成了没 123456789101112131415161718192021222324252627282930SQL&gt; set linesize 200;SQL&gt; set pagesize 20;SQL&gt; select * from v$nls_parameters;PARAMETER VALUE---------------------------------------------------------------- ----------------------------------------------------------------NLS_LANGUAGE AMERICANNLS_TERRITORY AMERICANLS_CURRENCY $NLS_ISO_CURRENCY AMERICANLS_NUMERIC_CHARACTERS .,NLS_CALENDAR GREGORIANNLS_DATE_FORMAT DD-MON-RRNLS_DATE_LANGUAGE AMERICANNLS_CHARACTERSET `ZHS16GBK`NLS_SORT BINARYNLS_TIME_FORMAT HH.MI.SSXFF AMNLS_TIMESTAMP_FORMAT DD-MON-RR HH.MI.SSXFF AMNLS_TIME_TZ_FORMAT HH.MI.SSXFF AM TZRNLS_TIMESTAMP_TZ_FORMAT DD-MON-RR HH.MI.SSXFF AM TZRNLS_DUAL_CURRENCY $NLS_NCHAR_CHARACTERSET AL16UTF16NLS_COMP BINARYPARAMETER VALUE---------------------------------------------------------------- ----------------------------------------------------------------NLS_LENGTH_SEMANTICS BYTENLS_NCHAR_CONV_EXCP FALSE19 rows selected. 干成了]]></content>
       <tags>
         <tag>CentOS</tag>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
         <tag>中文编码</tag>
       </tags>
   </entry>
@@ -188,8 +188,8 @@
       <tags>
         <tag>CentOS</tag>
         <tag>Linux</tag>
-        <tag>Oracle</tag>
         <tag>数据库</tag>
+        <tag>Oracle</tag>
       </tags>
   </entry>
   <entry>

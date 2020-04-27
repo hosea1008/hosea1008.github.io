@@ -5,30 +5,6 @@
     
     
   <url>
-    <loc>https://www.hsli.top/2014%E8%BF%9C%E5%BE%81-%E8%A7%86%E9%A2%91.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>2014远征-记录</title>
-        <pubTime>2016-08-15T14:28:08.000Z</pubTime>
-        
-        <tag>骑行</tag>
-         
-        <tag>远征</tag>
-         
-        <tag>骑迹</tag>
-         
-         
-           
-             
-              <breadCrumb title="骑迹" url="https://www.hsli.top/categories/%E9%AA%91%E8%BF%B9/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://www.hsli.top/C-C-%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89-%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -46,6 +22,30 @@
            
              
               <breadCrumb title="编程语言" url="https://www.hsli.top/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/2014%E8%BF%9C%E5%BE%81-%E8%A7%86%E9%A2%91.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>2014远征-记录</title>
+        <pubTime>2016-08-15T14:28:08.000Z</pubTime>
+        
+        <tag>骑行</tag>
+         
+        <tag>远征</tag>
+         
+        <tag>骑迹</tag>
+         
+         
+           
+             
+              <breadCrumb title="骑迹" url="https://www.hsli.top/categories/%E9%AA%91%E8%BF%B9/"/>
           
         </display>
     </data>
@@ -122,6 +122,29 @@
 
     
   <url>
+    <loc>https://www.hsli.top/CentOS-Kettle%E4%B8%8D%E5%90%8C%E5%AD%97%E7%AC%A6%E9%9B%86%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B9%8B%E9%97%B4%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>CentOS Kettle不同字符集数据库之间中文乱码问题</title>
+        <pubTime>2017-04-14T10:33:49.000Z</pubTime>
+        
+        <tag>CentOS</tag>
+         
+        <tag>数据库</tag>
+         
+        <tag>编码</tag>
+         
+        <tag>Oracle</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://www.hsli.top/CentOS-Linux%E8%BF%9C%E7%A8%8BOracle%E8%A7%A3%E5%86%B3%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -131,9 +154,9 @@
         
         <tag>CentOS</tag>
          
-        <tag>Oracle</tag>
-         
         <tag>数据库</tag>
+         
+        <tag>Oracle</tag>
          
         <tag>中文编码</tag>
          
@@ -145,20 +168,20 @@
 
     
   <url>
-    <loc>https://www.hsli.top/CentOS-Kettle%E4%B8%8D%E5%90%8C%E5%AD%97%E7%AC%A6%E9%9B%86%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B9%8B%E9%97%B4%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.html</loc>
+    <loc>https://www.hsli.top/CentOS-Oracle%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>CentOS Kettle不同字符集数据库之间中文乱码问题</title>
-        <pubTime>2017-04-14T10:33:49.000Z</pubTime>
+        <title>CentOS Oracle远程访问</title>
+        <pubTime>2017-03-20T02:23:27.000Z</pubTime>
         
         <tag>CentOS</tag>
          
-        <tag>Oracle</tag>
+        <tag>Linux</tag>
          
         <tag>数据库</tag>
          
-        <tag>编码</tag>
+        <tag>Oracle</tag>
          
          
            
@@ -186,29 +209,6 @@
              
               <breadCrumb title="Linux" url="https://www.hsli.top/categories/Linux/"/>
           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/CentOS-Oracle%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>CentOS Oracle远程访问</title>
-        <pubTime>2017-03-20T02:23:27.000Z</pubTime>
-        
-        <tag>CentOS</tag>
-         
-        <tag>Linux</tag>
-         
-        <tag>Oracle</tag>
-         
-        <tag>数据库</tag>
-         
-         
-           
         </display>
     </data>
     </url>
@@ -257,6 +257,30 @@
 
     
   <url>
+    <loc>https://www.hsli.top/Hexo-Next%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%8F%90%E4%BA%A4%E7%99%BE%E5%BA%A6%E8%B0%B7%E6%AD%8C%E6%94%B6%E5%BD%95.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>Hexo+Next主题博客提交百度谷歌收录</title>
+        <pubTime>2016-11-28T12:55:22.000Z</pubTime>
+        
+        <tag>Hexo</tag>
+         
+        <tag>Github</tag>
+         
+        <tag>Coding</tag>
+         
+         
+           
+             
+              <breadCrumb title="博客" url="https://www.hsli.top/categories/%E5%8D%9A%E5%AE%A2/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://www.hsli.top/Hexo%E5%8D%9A%E5%AE%A2%E5%90%8C%E6%97%B6%E9%83%A8%E7%BD%B2%E5%9C%A8Github%E5%92%8CCoding%E4%B8%8A.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -281,12 +305,12 @@
 
     
   <url>
-    <loc>https://www.hsli.top/Hexo-Next%E4%B8%BB%E9%A2%98%E5%8D%9A%E5%AE%A2%E6%8F%90%E4%BA%A4%E7%99%BE%E5%BA%A6%E8%B0%B7%E6%AD%8C%E6%94%B6%E5%BD%95.html</loc>
+    <loc>https://www.hsli.top/Hexo%E5%8D%9A%E5%AE%A2%E5%A4%87%E4%BB%BD%E7%A7%BB%E6%A4%8D%E5%A1%AB%E5%9D%91%E8%AE%B0.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>Hexo+Next主题博客提交百度谷歌收录</title>
-        <pubTime>2016-11-28T12:55:22.000Z</pubTime>
+        <title>Hexo博客备份移植填坑记</title>
+        <pubTime>2016-11-30T02:19:59.000Z</pubTime>
         
         <tag>Hexo</tag>
          
@@ -320,30 +344,6 @@
            
              
               <breadCrumb title="编程语言" url="https://www.hsli.top/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/Hexo%E5%8D%9A%E5%AE%A2%E5%A4%87%E4%BB%BD%E7%A7%BB%E6%A4%8D%E5%A1%AB%E5%9D%91%E8%AE%B0.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>Hexo博客备份移植填坑记</title>
-        <pubTime>2016-11-30T02:19:59.000Z</pubTime>
-        
-        <tag>Hexo</tag>
-         
-        <tag>Github</tag>
-         
-        <tag>Coding</tag>
-         
-         
-           
-             
-              <breadCrumb title="博客" url="https://www.hsli.top/categories/%E5%8D%9A%E5%AE%A2/"/>
           
         </display>
     </data>
@@ -418,9 +418,9 @@
          
         <tag>Linux</tag>
          
-        <tag>Oracle</tag>
-         
         <tag>数据库</tag>
+         
+        <tag>Oracle</tag>
          
          
            
@@ -437,28 +437,9 @@
         <title>Oracle常用概念及命令</title>
         <pubTime>2017-04-13T10:28:19.000Z</pubTime>
         
-        <tag>Oracle</tag>
-         
         <tag>数据库</tag>
          
-         
-           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/Python%E8%BF%9E%E6%8E%A5Oracle%E6%95%B0%E6%8D%AE%E5%BA%93cx-Oracle%E9%85%8D%E7%BD%AE.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>Python连接Oracle数据库cx_Oracle配置</title>
-        <pubTime>2017-04-25T08:25:55.000Z</pubTime>
-        
         <tag>Oracle</tag>
-         
-        <tag>Python</tag>
          
          
            
@@ -475,9 +456,9 @@
         <title>PowerDesigner快速创建数据库</title>
         <pubTime>2017-03-31T14:42:05.000Z</pubTime>
         
-        <tag>Oracle</tag>
-         
         <tag>数据库</tag>
+         
+        <tag>Oracle</tag>
          
         <tag>Power Designer</tag>
          
@@ -513,6 +494,51 @@
 
     
   <url>
+    <loc>https://www.hsli.top/Python%E8%BF%9E%E6%8E%A5Oracle%E6%95%B0%E6%8D%AE%E5%BA%93cx-Oracle%E9%85%8D%E7%BD%AE.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>Python连接Oracle数据库cx_Oracle配置</title>
+        <pubTime>2017-04-25T08:25:55.000Z</pubTime>
+        
+        <tag>Oracle</tag>
+         
+        <tag>Python</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/Ubuntu-12-04-VPS-%E6%90%AD%E5%BB%BALNMP%E7%8E%AF%E5%A2%83.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>Ubuntu 12.04 VPS 搭建LNMP环境</title>
+        <pubTime>2016-09-29T14:40:47.000Z</pubTime>
+        
+        <tag>Linux</tag>
+         
+        <tag>Ubuntu</tag>
+         
+        <tag>VPS</tag>
+         
+        <tag>LNMP</tag>
+         
+         
+           
+             
+              <breadCrumb title="Linux" url="https://www.hsli.top/categories/Linux/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://www.hsli.top/SSD-HDD-%E5%9B%BA%E6%80%81%E6%9C%BA%E6%A2%B0%E5%8F%8C%E7%A1%AC%E7%9B%98-Ubuntu-Win7-%E5%8F%8C%E7%B3%BB%E7%BB%9F.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -539,44 +565,20 @@
 
     
   <url>
-    <loc>https://www.hsli.top/Ubuntu%E4%B8%8A%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2%E7%8E%AF%E5%A2%83.html</loc>
+    <loc>https://www.hsli.top/Ubuntu14%E4%B8%8BOpenCV3%E5%92%8CQT5%E7%9A%84%E5%AE%89%E8%A3%85%E5%8F%8A%E8%81%94%E5%90%88%E4%BD%BF%E7%94%A8.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>Ubuntu上搭建Hexo博客环境</title>
-        <pubTime>2017-02-26T03:01:16.000Z</pubTime>
-        
-        <tag>Hexo</tag>
-         
-        <tag>Ubuntu</tag>
-         
-        <tag>博客</tag>
-         
-         
-           
-             
-              <breadCrumb title="博客" url="https://www.hsli.top/categories/%E5%8D%9A%E5%AE%A2/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/Ubuntu-12-04-VPS-%E6%90%AD%E5%BB%BALNMP%E7%8E%AF%E5%A2%83.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>Ubuntu 12.04 VPS 搭建LNMP环境</title>
-        <pubTime>2016-09-29T14:40:47.000Z</pubTime>
+        <title>Ubuntu14下OpenCV3和QT5的安装及联合使用</title>
+        <pubTime>2016-02-23T14:44:56.000Z</pubTime>
         
         <tag>Linux</tag>
          
+        <tag>OpenCV</tag>
+         
+        <tag>Qt</tag>
+         
         <tag>Ubuntu</tag>
-         
-        <tag>VPS</tag>
-         
-        <tag>LNMP</tag>
          
          
            
@@ -633,29 +635,47 @@
 
     
   <url>
-    <loc>https://www.hsli.top/Ubuntu-VPS%E5%BC%80%E5%90%AFroot%E8%B4%A6%E6%88%B7SSH%E7%99%BB%E5%BD%95.html</loc>
+    <loc>https://www.hsli.top/Ubuntu%E4%B8%8A%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2%E7%8E%AF%E5%A2%83.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>Ubuntu VPS开启root账户SSH登录</title>
-        <pubTime>2016-08-10T11:58:34.000Z</pubTime>
+        <title>Ubuntu上搭建Hexo博客环境</title>
+        <pubTime>2017-02-26T03:01:16.000Z</pubTime>
         
+        <tag>Hexo</tag>
+         
         <tag>Ubuntu</tag>
          
-        <tag>VPS</tag>
-         
-        <tag>root</tag>
-         
-        <tag>SSH</tag>
-         
-        <tag>vim</tag>
-         
-        <tag>vimtutor</tag>
+        <tag>博客</tag>
          
          
            
              
-              <breadCrumb title="Linux" url="https://www.hsli.top/categories/Linux/"/>
+              <breadCrumb title="博客" url="https://www.hsli.top/categories/%E5%8D%9A%E5%AE%A2/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/Win7-OpenCV-2-4-13-Visual-Studio-2015%E4%B8%80%E5%8A%B3%E6%B0%B8%E9%80%B8%E7%9A%84%E9%85%8D%E7%BD%AE.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>Win7+OpenCV 2.4.13+Visual Studio 2015一劳永逸的配置</title>
+        <pubTime>2016-09-30T14:40:47.000Z</pubTime>
+        
+        <tag>OpenCV</tag>
+         
+        <tag>Visual Studio</tag>
+         
+        <tag>Win7</tag>
+         
+         
+           
+             
+              <breadCrumb title="图像识别" url="https://www.hsli.top/categories/%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB/"/>
           
         </display>
     </data>
@@ -684,30 +704,6 @@
            
              
               <breadCrumb title="机器学习" url="https://www.hsli.top/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/Win7-OpenCV-2-4-13-Visual-Studio-2015%E4%B8%80%E5%8A%B3%E6%B0%B8%E9%80%B8%E7%9A%84%E9%85%8D%E7%BD%AE.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>Win7+OpenCV 2.4.13+Visual Studio 2015一劳永逸的配置</title>
-        <pubTime>2016-09-30T14:40:47.000Z</pubTime>
-        
-        <tag>OpenCV</tag>
-         
-        <tag>Visual Studio</tag>
-         
-        <tag>Win7</tag>
-         
-         
-           
-             
-              <breadCrumb title="图像识别" url="https://www.hsli.top/categories/%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB/"/>
           
         </display>
     </data>
@@ -759,30 +755,6 @@
 
     
   <url>
-    <loc>https://www.hsli.top/%E4%BA%94%E6%9C%88%E4%BA%BA%E5%80%8D%E5%BF%99.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>五月人倍忙</title>
-        <pubTime>2017-05-11T13:51:38.000Z</pubTime>
-        
-        <tag>感悟</tag>
-         
-        <tag>社会</tag>
-         
-        <tag>生活</tag>
-         
-         
-           
-             
-              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://www.hsli.top/%E5%9C%A8PYPI%E4%B8%8A%E5%8F%91%E5%B8%83%E8%BD%AF%E4%BB%B6.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -798,18 +770,18 @@
 
     
   <url>
-    <loc>https://www.hsli.top/%E5%8D%81%E6%9C%88%E5%A4%A7%EF%BC%8C%E8%A1%8C%E4%BA%91%E6%B5%81%E6%B0%B4.html</loc>
+    <loc>https://www.hsli.top/%E4%BA%94%E6%9C%88%E4%BA%BA%E5%80%8D%E5%BF%99.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>十月大，行云流水</title>
-        <pubTime>2013-11-23T16:08:01.000Z</pubTime>
+        <title>五月人倍忙</title>
+        <pubTime>2017-05-11T13:51:38.000Z</pubTime>
         
         <tag>感悟</tag>
          
-        <tag>生活</tag>
+        <tag>社会</tag>
          
-        <tag>我的大学</tag>
+        <tag>生活</tag>
          
          
            
@@ -844,12 +816,60 @@
 
     
   <url>
+    <loc>https://www.hsli.top/%E5%8D%81%E6%9C%88%E5%A4%A7%EF%BC%8C%E8%A1%8C%E4%BA%91%E6%B5%81%E6%B0%B4.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>十月大，行云流水</title>
+        <pubTime>2013-11-23T16:08:01.000Z</pubTime>
+        
+        <tag>感悟</tag>
+         
+        <tag>生活</tag>
+         
+        <tag>我的大学</tag>
+         
+         
+           
+             
+              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://www.hsli.top/%E6%96%91%E6%96%93%E4%B9%9D%E6%9C%88.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
         <title>斑斓九月</title>
         <pubTime>2013-10-12T16:05:13.000Z</pubTime>
+        
+        <tag>感悟</tag>
+         
+        <tag>生活</tag>
+         
+        <tag>我的大学</tag>
+         
+         
+           
+             
+              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/%E6%9C%9D%E4%B9%9D%E6%99%9A%E4%BA%94%E4%B8%8E%E6%B5%AA%E8%BF%B9%E5%A4%A9%E6%B6%AF.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>朝九晚五与浪迹天涯</title>
+        <pubTime>2016-12-05T04:55:09.000Z</pubTime>
         
         <tag>感悟</tag>
          
@@ -894,30 +914,6 @@
 
     
   <url>
-    <loc>https://www.hsli.top/%E6%9C%9D%E4%B9%9D%E6%99%9A%E4%BA%94%E4%B8%8E%E6%B5%AA%E8%BF%B9%E5%A4%A9%E6%B6%AF.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>朝九晚五与浪迹天涯</title>
-        <pubTime>2016-12-05T04:55:09.000Z</pubTime>
-        
-        <tag>感悟</tag>
-         
-        <tag>生活</tag>
-         
-        <tag>我的大学</tag>
-         
-         
-           
-             
-              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://www.hsli.top/%E6%A0%91%E8%8E%93%E6%B4%BEpybluez%E5%A1%AB%E5%9D%91.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -938,48 +934,6 @@
 
     
   <url>
-    <loc>https://www.hsli.top/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%97%A0%E7%BA%BF%E4%B8%AD%E7%BB%A7.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>树莓派无线中继</title>
-        <pubTime>2018-12-09T09:39:44.000Z</pubTime>
-        
-        <tag>树莓派</tag>
-         
-         
-           
-             
-              <breadCrumb title="树莓派" url="https://www.hsli.top/categories/%E6%A0%91%E8%8E%93%E6%B4%BE/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://www.hsli.top/%E7%89%A9%E8%81%94%E7%BD%91%E4%BA%91%E5%B9%B3%E5%8F%B0%E8%B0%83%E8%AF%95%E6%89%8B%E8%AE%B0.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>物联网云平台调试手记</title>
-        <pubTime>2015-06-09T13:59:37.000Z</pubTime>
-        
-        <tag>物联网</tag>
-         
-        <tag>云平台</tag>
-         
-         
-           
-             
-              <breadCrumb title="物联网" url="https://www.hsli.top/categories/%E7%89%A9%E8%81%94%E7%BD%91/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://www.hsli.top/%E6%B8%85%E9%99%A4%E5%92%8C%E7%A6%81%E7%94%A8archibelog%E8%A7%A3%E5%86%B3ORA-00257.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -987,9 +941,9 @@
         <title>清除和禁用archivelog解决ORA-00257</title>
         <pubTime>2017-03-31T14:30:15.000Z</pubTime>
         
-        <tag>Oracle</tag>
-         
         <tag>数据库</tag>
+         
+        <tag>Oracle</tag>
          
         <tag>日志</tag>
          
@@ -1017,6 +971,28 @@
         <tag>路由器</tag>
          
         <tag>传感器</tag>
+         
+         
+           
+             
+              <breadCrumb title="物联网" url="https://www.hsli.top/categories/%E7%89%A9%E8%81%94%E7%BD%91/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/%E7%89%A9%E8%81%94%E7%BD%91%E4%BA%91%E5%B9%B3%E5%8F%B0%E8%B0%83%E8%AF%95%E6%89%8B%E8%AE%B0.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>物联网云平台调试手记</title>
+        <pubTime>2015-06-09T13:59:37.000Z</pubTime>
+        
+        <tag>物联网</tag>
+         
+        <tag>云平台</tag>
          
          
            
@@ -1101,32 +1077,6 @@
 
     
   <url>
-    <loc>https://www.hsli.top/%E9%BE%99%E8%88%9F.html</loc>
-    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
-    <data>
-        <display>
-        <title>龙舟</title>
-        <pubTime>2015-06-21T15:14:13.000Z</pubTime>
-        
-        <tag>感悟</tag>
-         
-        <tag>生活</tag>
-         
-        <tag>民俗</tag>
-         
-        <tag>家乡</tag>
-         
-         
-           
-             
-              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://www.hsli.top/%E8%BF%9C%E5%BE%81-%E9%AA%91%E8%A1%8C-%E6%88%90%E9%83%BD-%E8%A5%BF%E5%AE%89-%E9%9D%92%E6%B5%B7%E6%B9%96.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -1157,6 +1107,62 @@
 
     
   <url>
+    <loc>https://www.hsli.top/%E9%BE%99%E8%88%9F.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>龙舟</title>
+        <pubTime>2015-06-21T15:14:13.000Z</pubTime>
+        
+        <tag>感悟</tag>
+         
+        <tag>生活</tag>
+         
+        <tag>民俗</tag>
+         
+        <tag>家乡</tag>
+         
+         
+           
+             
+              <breadCrumb title="生活感悟" url="https://www.hsli.top/categories/%E7%94%9F%E6%B4%BB%E6%84%9F%E6%82%9F/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://www.hsli.top/Ubuntu-VPS%E5%BC%80%E5%90%AFroot%E8%B4%A6%E6%88%B7SSH%E7%99%BB%E5%BD%95.html</loc>
+    <lastmod>2020-04-22T14:12:16.280Z</lastmod>
+    <data>
+        <display>
+        <title>Ubuntu VPS开启root账户SSH登录</title>
+        <pubTime>2016-08-10T11:58:34.000Z</pubTime>
+        
+        <tag>Ubuntu</tag>
+         
+        <tag>VPS</tag>
+         
+        <tag>root</tag>
+         
+        <tag>SSH</tag>
+         
+        <tag>vim</tag>
+         
+        <tag>vimtutor</tag>
+         
+         
+           
+             
+              <breadCrumb title="Linux" url="https://www.hsli.top/categories/Linux/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://www.hsli.top/Ubuntu%E6%B7%BB%E5%8A%A0%E5%BF%AB%E6%8D%B7%E6%96%B9%E5%BC%8F.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
@@ -1179,25 +1185,19 @@
 
     
   <url>
-    <loc>https://www.hsli.top/Ubuntu14%E4%B8%8BOpenCV3%E5%92%8CQT5%E7%9A%84%E5%AE%89%E8%A3%85%E5%8F%8A%E8%81%94%E5%90%88%E4%BD%BF%E7%94%A8.html</loc>
+    <loc>https://www.hsli.top/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%97%A0%E7%BA%BF%E4%B8%AD%E7%BB%A7.html</loc>
     <lastmod>2020-04-22T14:12:16.280Z</lastmod>
     <data>
         <display>
-        <title>Ubuntu14下OpenCV3和QT5的安装及联合使用</title>
-        <pubTime>2016-02-23T14:44:56.000Z</pubTime>
+        <title>树莓派无线中继</title>
+        <pubTime>2018-12-09T09:39:44.000Z</pubTime>
         
-        <tag>Linux</tag>
-         
-        <tag>OpenCV</tag>
-         
-        <tag>Qt</tag>
-         
-        <tag>Ubuntu</tag>
+        <tag>树莓派</tag>
          
          
            
              
-              <breadCrumb title="Linux" url="https://www.hsli.top/categories/Linux/"/>
+              <breadCrumb title="树莓派" url="https://www.hsli.top/categories/%E6%A0%91%E8%8E%93%E6%B4%BE/"/>
           
         </display>
     </data>
